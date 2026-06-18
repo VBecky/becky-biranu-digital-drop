@@ -196,6 +196,7 @@ function Index() {
           <a href="#home">Home</a>
           <a href="#about">About</a>
           <a href="#projects">Projects</a>
+          <a href="#blog">Blog</a>
           <a href="#contact">Contact</a>
         </div>
         <button id="theme-toggle" className="theme-toggle" aria-label="Toggle theme">◐</button>
@@ -319,6 +320,72 @@ function Index() {
               </div>
             </article>
           ))}
+        </div>
+      </section>
+
+      {/* BLOG */}
+      <section id="blog" className="section">
+        <div className="section-head reveal">
+          <span className="kicker">03 / Journal</span>
+          <h2>Notes from the <span className="grad">edge</span>.</h2>
+          <p className="section-sub">Essays, experiments and field notes on motion, shaders and crafting interfaces that feel alive.</p>
+        </div>
+        <div className="blog-grid">
+          {[
+            {
+              cat: "Motion",
+              date: "Mar 12, 2026",
+              read: "6 min",
+              title: "The Physics of Feel: Easing Curves That Breathe",
+              desc: "Why default cubic-bezier curves flatten your UI — and the four custom easings I reach for instead.",
+              hue: "from-cyan-400/40 to-violet-500/30",
+              bg: "linear-gradient(135deg,#0ea5e9 0%,#7c3aed 100%)",
+            },
+            {
+              cat: "WebGL",
+              date: "Feb 28, 2026",
+              read: "11 min",
+              title: "Shader Lighting for People Who Hate Math",
+              desc: "A gentle, visual walk through fragment shaders, normal maps and the magic of rim light.",
+              hue: "from-emerald-400/40 to-cyan-500/30",
+              bg: "linear-gradient(135deg,#10b981 0%,#0ea5e9 100%)",
+            },
+            {
+              cat: "Design Systems",
+              date: "Feb 04, 2026",
+              read: "8 min",
+              title: "Glassmorphism, Reconsidered",
+              desc: "Glass UI is back — here's how to use blur, noise and tinting without making everything feel cheap.",
+              hue: "from-fuchsia-400/40 to-amber-500/30",
+              bg: "linear-gradient(135deg,#d946ef 0%,#f59e0b 100%)",
+            },
+          ].map((post, i) => (
+            <article
+              key={post.title}
+              className="glass blog-card tilt reveal"
+              style={{ animationDelay: `${i * 90}ms` }}
+            >
+              <div className="blog-thumb" style={{ background: post.bg }}>
+                <span className="blog-thumb-glow" />
+                <span className="blog-cat">{post.cat}</span>
+              </div>
+              <div className="blog-meta">
+                <div className="blog-info">
+                  <span>{post.date}</span>
+                  <span className="dot">·</span>
+                  <span>{post.read} read</span>
+                </div>
+                <h3>{post.title}</h3>
+                <p>{post.desc}</p>
+                <a href="#blog" className="blog-link">
+                  Read article <span className="arrow">→</span>
+                </a>
+              </div>
+            </article>
+          ))}
+        </div>
+        <div className="blog-cta reveal">
+          <a href="#blog" className="drop-btn ghost">View all writing</a>
         </div>
       </section>
 
