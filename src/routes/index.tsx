@@ -576,6 +576,27 @@ body.light #bg-canvas{opacity:.35}
 .section-head.center{margin:0 auto 48px;text-align:center}
 .kicker{display:inline-block;font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:#7fe3ff;margin-bottom:14px}
 .section-head h2{font-size:clamp(32px,5vw,56px);font-weight:600;letter-spacing:-.02em;line-height:1.05}
+.section-sub{margin-top:18px;color:#8a93a8;font-size:15px;line-height:1.7;max-width:560px}
+
+/* blog */
+.blog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+@media (max-width:1000px){.blog-grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:640px){.blog-grid{grid-template-columns:1fr}}
+.blog-card{padding:14px;display:flex;flex-direction:column;cursor:none;transition:transform .5s cubic-bezier(.2,.8,.2,1),box-shadow .4s}
+.blog-card:hover{box-shadow:0 30px 60px -20px rgba(167,139,250,.25),0 0 0 1px rgba(167,139,250,.3)}
+.blog-thumb{position:relative;aspect-ratio:16/10;border-radius:14px;overflow:hidden;display:flex;align-items:flex-start;justify-content:flex-start;padding:14px}
+.blog-thumb-glow{position:absolute;inset:0;background:radial-gradient(circle at 25% 15%,rgba(255,255,255,.45),transparent 55%),radial-gradient(circle at 80% 90%,rgba(0,0,0,.25),transparent 60%);mix-blend-mode:overlay;pointer-events:none}
+.blog-cat{position:relative;font-size:11px;letter-spacing:.22em;text-transform:uppercase;padding:6px 12px;border-radius:999px;background:rgba(8,12,22,.55);backdrop-filter:blur(10px);color:#e7ecf3;border:1px solid rgba(255,255,255,.12)}
+.blog-meta{padding:18px 10px 12px;display:flex;flex-direction:column;gap:10px;flex:1}
+.blog-info{display:flex;gap:8px;font-size:12px;color:#7a8499;letter-spacing:.08em}
+.blog-info .dot{opacity:.5}
+.blog-meta h3{font-size:19px;font-weight:600;line-height:1.3;letter-spacing:-.01em}
+.blog-meta p{font-size:14px;color:#8a93a8;line-height:1.6;flex:1}
+.blog-link{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:#7fe3ff;letter-spacing:.08em;margin-top:6px;transition:gap .3s}
+.blog-link .arrow{transition:transform .3s}
+.blog-card:hover .blog-link{gap:14px}
+.blog-card:hover .blog-link .arrow{transform:translateX(4px)}
+.blog-cta{display:flex;justify-content:center;margin-top:36px}
 
 /* about */
 .about-layout{display:grid;grid-template-columns:0.85fr 1.15fr;gap:32px;align-items:start}
