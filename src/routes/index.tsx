@@ -1,29 +1,536 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect } from "react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Your App" },
-      { name: "description", content: "Replace this with a one-sentence description of your app." },
-      { property: "og:title", content: "Your App" },
-      { property: "og:description", content: "Replace this with a one-sentence description of your app." },
+      { title: "Becky Biranu — Creative Developer & Futuristic UI Designer" },
+      {
+        name: "description",
+        content:
+          "Portfolio of Becky Biranu — a creative developer crafting futuristic, immersive digital experiences with liquid UI and motion design.",
+      },
+      { property: "og:title", content: "Becky Biranu — Creative Developer" },
+      {
+        property: "og:description",
+        content: "Futuristic portfolio with liquid water-drop UI, glassmorphism and motion.",
+      },
     ],
   }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
 function Index() {
+  useEffect(() => {
+    // ===== Particles =====
+    const canvas = document.getElementById("bg-canvas") as HTMLCanvasElement | null;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    let w = (canvas.width = window.innerWidth);
+    let h = (canvas.height = window.innerHeight);
+    const particles: { x: number; y: number; vx: number; vy: number; r: number }[] = [];
+    for (let i = 0; i < 80; i++) {
+      particles.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3,
+        r: Math.random() * 1.8 + 0.4,
+      });
+    }
+    let raf = 0;
+    const draw = () => {
+      ctx.clearRect(0, 0, w, h);
+      for (const p of particles) {
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.x < 0 || p.x > w) p.vx *= -1;
+        if (p.y < 0 || p.y > h) p.vy *= -1;
+        const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 6);
+        g.addColorStop(0, "rgba(120,220,255,0.9)");
+        g.addColorStop(1, "rgba(120,220,255,0)");
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r * 6, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const d = Math.hypot(dx, dy);
+          if (d < 120) {
+            ctx.strokeStyle = `rgba(120,220,255,${0.12 * (1 - d / 120)})`;
+            ctx.lineWidth = 0.6;
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+      raf = requestAnimationFrame(draw);
+    };
+    draw();
+    const onResize = () => {
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+    };
+    window.addEventListener("resize", onResize);
+
+    // ===== Custom cursor =====
+    const cursor = document.getElementById("cursor")!;
+    const cursorDot = document.getElementById("cursor-dot")!;
+    let mx = 0,
+      my = 0,
+      cx = 0,
+      cy = 0;
+    const onMove = (e: MouseEvent) => {
+      mx = e.clientX;
+      my = e.clientY;
+      cursorDot.style.transform = `translate(${mx - 3}px, ${my - 3}px)`;
+    };
+    window.addEventListener("mousemove", onMove);
+    const tick = () => {
+      cx += (mx - cx) * 0.15;
+      cy += (my - cy) * 0.15;
+      cursor.style.transform = `translate(${cx - 20}px, ${cy - 20}px)`;
+      requestAnimationFrame(tick);
+    };
+    tick();
+
+    // ===== Water drop ripple =====
+    document.querySelectorAll<HTMLElement>(".drop-btn").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        const rect = btn.getBoundingClientRect();
+        const ripple = document.createElement("span");
+        ripple.className = "ripple";
+        const size = Math.max(rect.width, rect.height) * 1.8;
+        ripple.style.width = ripple.style.height = size + "px";
+        ripple.style.left = (e as MouseEvent).clientX - rect.left - size / 2 + "px";
+        ripple.style.top = (e as MouseEvent).clientY - rect.top - size / 2 + "px";
+        btn.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 800);
+      });
+    });
+
+    // ===== Scroll reveals =====
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((en) => {
+          if (en.isIntersecting) en.target.classList.add("in");
+        });
+      },
+      { threshold: 0.12 },
+    );
+    document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+
+    // ===== Tilt =====
+    document.querySelectorAll<HTMLElement>(".tilt").forEach((card) => {
+      card.addEventListener("mousemove", (e) => {
+        const r = card.getBoundingClientRect();
+        const px = (e.clientX - r.left) / r.width - 0.5;
+        const py = (e.clientY - r.top) / r.height - 0.5;
+        card.style.transform = `perspective(900px) rotateY(${px * 10}deg) rotateX(${-py * 10}deg) translateY(-4px)`;
+      });
+      card.addEventListener("mouseleave", () => {
+        card.style.transform = "";
+      });
+    });
+
+    // ===== Smooth anchor nav =====
+    document.querySelectorAll<HTMLAnchorElement>('a[href^="#"]').forEach((a) => {
+      a.addEventListener("click", (e) => {
+        const id = a.getAttribute("href")!.slice(1);
+        const el = document.getElementById(id);
+        if (el) {
+          e.preventDefault();
+          el.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      });
+    });
+
+    // ===== Theme toggle =====
+    const themeBtn = document.getElementById("theme-toggle");
+    themeBtn?.addEventListener("click", () => {
+      document.body.classList.toggle("light");
+    });
+
+    // ===== Project modal =====
+    const modal = document.getElementById("project-modal")!;
+    const modalBody = document.getElementById("modal-body")!;
+    document.querySelectorAll<HTMLElement>(".project-card").forEach((card) => {
+      card.addEventListener("click", () => {
+        modalBody.innerHTML = `
+          <h3>${card.dataset.title}</h3>
+          <p class="tech">${card.dataset.tech}</p>
+          <p>${card.dataset.full}</p>
+        `;
+        modal.classList.add("open");
+      });
+    });
+    document.getElementById("modal-close")?.addEventListener("click", () => modal.classList.remove("open"));
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) modal.classList.remove("open");
+    });
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", onResize);
+      window.removeEventListener("mousemove", onMove);
+      io.disconnect();
+    };
+  }, []);
+
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+    <>
+      <style>{CSS}</style>
+      <div id="cursor" />
+      <div id="cursor-dot" />
+      <canvas id="bg-canvas" />
+
+      <nav className="nav glass">
+        <div className="logo">BB<span>.</span></div>
+        <div className="nav-links">
+          <a href="#home">Home</a>
+          <a href="#about">About</a>
+          <a href="#projects">Projects</a>
+          <a href="#contact">Contact</a>
+        </div>
+        <button id="theme-toggle" className="theme-toggle" aria-label="Toggle theme">◐</button>
+      </nav>
+
+      {/* HERO */}
+      <section id="home" className="hero">
+        <div className="hero-inner">
+          <div className="badge reveal">● Available for work — 2026</div>
+          <h1 className="hero-title reveal">
+            Hi, I'm <span className="grad">Becky Biranu</span>
+          </h1>
+          <p className="hero-sub reveal">Creative Developer & Futuristic UI Designer</p>
+          <p className="hero-desc reveal">
+            Crafting next-generation digital experiences where motion, light and liquid interaction meet.
+          </p>
+          <div className="hero-ctas reveal">
+            <a href="#projects" className="drop-btn primary">View Projects</a>
+            <a href="#contact" className="drop-btn ghost">Contact Me</a>
+          </div>
+        </div>
+        <div className="orb orb-1" />
+        <div className="orb orb-2" />
+        <div className="scroll-hint">scroll ↓</div>
+      </section>
+
+      {/* ABOUT */}
+      <section id="about" className="section">
+        <div className="section-head reveal">
+          <span className="kicker">01 / About</span>
+          <h2>A developer obsessed with detail.</h2>
+        </div>
+        <div className="about-grid">
+          <div className="glass card bio reveal">
+            <p>
+              I'm Becky — a developer-designer hybrid based on the edge of code and craft. For 6+ years I've shipped
+              interfaces for startups, agencies and ambitious solo founders, blending engineering rigor with
+              cinematic motion design.
+            </p>
+            <p>I care about <em>feel</em>: the milliseconds, the easing, the glow.</p>
+          </div>
+          {[
+            { t: "Frontend", v: 95, d: "React · TS · Vite" },
+            { t: "UI / UX", v: 90, d: "Figma · Systems" },
+            { t: "Motion", v: 88, d: "GSAP · WebGL" },
+            { t: "3D / Shaders", v: 75, d: "Three · GLSL" },
+          ].map((s) => (
+            <div key={s.t} className="glass card skill tilt reveal">
+              <Ring value={s.v} />
+              <h4>{s.t}</h4>
+              <p>{s.d}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* PROJECTS */}
+      <section id="projects" className="section">
+        <div className="section-head reveal">
+          <span className="kicker">02 / Selected work</span>
+          <h2>Projects that move.</h2>
+        </div>
+        <div className="projects-grid">
+          {PROJECTS.map((p, i) => (
+            <article
+              key={p.title}
+              className="glass project-card tilt reveal"
+              data-title={p.title}
+              data-tech={p.tech}
+              data-full={p.full}
+              style={{ animationDelay: `${i * 80}ms` }}
+            >
+              <div className="thumb" style={{ background: p.bg }}>
+                <span className="thumb-glow" />
+                <span className="thumb-num">0{i + 1}</span>
+              </div>
+              <div className="project-meta">
+                <h3>{p.title}</h3>
+                <p>{p.desc}</p>
+                <div className="tags">
+                  {p.tech.split(" · ").map((t) => (
+                    <span key={t} className="tag">{t}</span>
+                  ))}
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {/* CONTACT */}
+      <section id="contact" className="section contact">
+        <div className="section-head reveal center">
+          <span className="kicker">03 / Contact</span>
+          <h2>Let's build something <span className="grad">luminous</span>.</h2>
+        </div>
+        <form
+          className="glass contact-form reveal"
+          onSubmit={(e) => {
+            e.preventDefault();
+            const btn = e.currentTarget.querySelector(".drop-btn") as HTMLElement;
+            btn.textContent = "Sent ✓";
+            (e.currentTarget as HTMLFormElement).reset();
+            setTimeout(() => (btn.textContent = "Send Message"), 2200);
+          }}
+        >
+          <div className="row">
+            <label>
+              <span>Name</span>
+              <input required type="text" placeholder="Your name" />
+            </label>
+            <label>
+              <span>Email</span>
+              <input required type="email" placeholder="you@domain.com" />
+            </label>
+          </div>
+          <label>
+            <span>Message</span>
+            <textarea required rows={5} placeholder="Tell me about your project…" />
+          </label>
+          <button className="drop-btn primary" type="submit">Send Message</button>
+        </form>
+        <div className="socials reveal">
+          {[
+            { n: "GitHub", h: "https://github.com" },
+            { n: "LinkedIn", h: "https://linkedin.com" },
+            { n: "Email", h: "mailto:becky@biranu.dev" },
+          ].map((s) => (
+            <a key={s.n} href={s.h} className="social glass">{s.n}</a>
+          ))}
+        </div>
+      </section>
+
+      <footer className="footer">
+        <span>© 2026 Becky Biranu</span>
+        <span>Designed & built with obsession.</span>
+      </footer>
+
+      {/* Modal */}
+      <div id="project-modal" className="modal">
+        <div className="modal-inner glass">
+          <button id="modal-close" className="modal-close">×</button>
+          <div id="modal-body" />
+        </div>
+      </div>
+    </>
   );
 }
+
+function Ring({ value }: { value: number }) {
+  const r = 26;
+  const c = 2 * Math.PI * r;
+  const off = c - (value / 100) * c;
+  return (
+    <svg className="ring" width="72" height="72" viewBox="0 0 72 72">
+      <circle cx="36" cy="36" r={r} className="ring-bg" />
+      <circle
+        cx="36"
+        cy="36"
+        r={r}
+        className="ring-fg"
+        strokeDasharray={c}
+        strokeDashoffset={off}
+        transform="rotate(-90 36 36)"
+      />
+      <text x="36" y="41" textAnchor="middle" className="ring-text">{value}</text>
+    </svg>
+  );
+}
+
+const PROJECTS = [
+  {
+    title: "Nebula Finance",
+    desc: "Realtime trading dashboard with liquid data viz.",
+    tech: "React · WebGL · D3",
+    full: "A high-frequency trading interface built around liquid data visualisation, custom WebGL charts and a bespoke motion language. Shipped to 12k+ daily traders.",
+    bg: "linear-gradient(135deg,#0ea5e9,#6366f1,#a855f7)",
+  },
+  {
+    title: "Aurora OS",
+    desc: "Concept operating system with spatial UI.",
+    tech: "Three.js · GSAP · TS",
+    full: "An exploration of post-window computing — spatial panels, gestural navigation and an ambient soundscape that reacts to focus state.",
+    bg: "linear-gradient(135deg,#14b8a6,#22d3ee,#60a5fa)",
+  },
+  {
+    title: "Drift Studio",
+    desc: "Awwwards-winning agency site, fluid scroll.",
+    tech: "Next · Lenis · Shader",
+    full: "Editorial-meets-experiment site for a Berlin design studio. SOTD on Awwwards, FWA of the day, and a 98 Lighthouse score.",
+    bg: "linear-gradient(135deg,#f43f5e,#f59e0b,#fbbf24)",
+  },
+  {
+    title: "Pulse Health",
+    desc: "Wearable companion app with ambient UI.",
+    tech: "React Native · Reanimated",
+    full: "Calm-tech companion for a sleep wearable. Glanceable, never anxious — uses ambient color states instead of numbers when possible.",
+    bg: "linear-gradient(135deg,#10b981,#06b6d4,#8b5cf6)",
+  },
+  {
+    title: "Lumen Type",
+    desc: "Variable typeface playground with shaders.",
+    tech: "WebGL · GLSL · Canvas",
+    full: "An interactive specimen for a variable typeface — every glyph rendered through a custom fragment shader that responds to cursor velocity.",
+    bg: "linear-gradient(135deg,#ec4899,#a855f7,#3b82f6)",
+  },
+  {
+    title: "Helix Robotics",
+    desc: "Marketing site for an autonomy startup.",
+    tech: "Astro · Motion · MDX",
+    full: "Brand-system, identity rollout and marketing site for a Series-A robotics company. Built around a single hero shader and tight, restrained motion.",
+    bg: "linear-gradient(135deg,#1e293b,#0ea5e9,#22d3ee)",
+  },
+];
+
+const CSS = `
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#05060a;color:#e7ecf3;font-family:'Sora','Space Grotesk',Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden;cursor:none}
+body.light{background:#f4f6fb;color:#0b0e16}
+body.light .glass{background:rgba(255,255,255,0.55);border-color:rgba(0,0,0,0.06)}
+body.light .nav{background:rgba(255,255,255,0.6)}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+
+#bg-canvas{position:fixed;inset:0;width:100vw;height:100vh;z-index:0;pointer-events:none;opacity:.7}
+body.light #bg-canvas{opacity:.35}
+
+/* cursor */
+#cursor{position:fixed;top:0;left:0;width:40px;height:40px;border-radius:50%;border:1px solid rgba(120,220,255,.55);pointer-events:none;z-index:9999;mix-blend-mode:difference;transition:width .2s,height .2s}
+#cursor-dot{position:fixed;top:0;left:0;width:6px;height:6px;border-radius:50%;background:#7fe3ff;box-shadow:0 0 12px #7fe3ff;pointer-events:none;z-index:9999}
+@media (hover:none){#cursor,#cursor-dot{display:none}html,body{cursor:auto}}
+
+/* glass */
+.glass{background:rgba(18,22,34,0.45);backdrop-filter:blur(22px) saturate(140%);border:1px solid rgba(255,255,255,0.08);border-radius:20px}
+
+/* nav */
+.nav{position:fixed;top:18px;left:50%;transform:translateX(-50%);z-index:50;display:flex;align-items:center;gap:32px;padding:10px 18px;border-radius:999px}
+.nav .logo{font-weight:700;letter-spacing:.04em}
+.nav .logo span{color:#7fe3ff}
+.nav-links{display:flex;gap:22px;font-size:14px}
+.nav-links a{opacity:.75;transition:opacity .2s,color .2s}
+.nav-links a:hover{opacity:1;color:#7fe3ff}
+.theme-toggle{background:transparent;border:1px solid rgba(255,255,255,.15);color:inherit;width:32px;height:32px;border-radius:50%;cursor:none;font-size:14px}
+@media (max-width:640px){.nav-links{display:none}}
+
+/* hero */
+.hero{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:120px 24px 80px;z-index:1;overflow:hidden}
+.hero-inner{max-width:900px;text-align:center;position:relative;z-index:2}
+.badge{display:inline-block;padding:6px 14px;border-radius:999px;border:1px solid rgba(127,227,255,.3);font-size:12px;color:#7fe3ff;background:rgba(127,227,255,.06);margin-bottom:22px}
+.hero-title{font-size:clamp(40px,8vw,96px);font-weight:700;line-height:1.02;letter-spacing:-.03em;margin-bottom:18px}
+.grad{background:linear-gradient(120deg,#7fe3ff,#a78bfa 50%,#f0abfc);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-sub{font-size:clamp(16px,2.2vw,22px);color:#9aa6bd;margin-bottom:10px;font-weight:300}
+.hero-desc{font-size:15px;color:#7a8499;max-width:520px;margin:0 auto 36px}
+.hero-ctas{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.scroll-hint{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:#5a6480;animation:bob 2s ease-in-out infinite}
+@keyframes bob{50%{transform:translate(-50%,8px)}}
+.orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.45;z-index:1;pointer-events:none}
+.orb-1{width:480px;height:480px;background:#7fe3ff;top:-100px;left:-120px;animation:float 14s ease-in-out infinite}
+.orb-2{width:520px;height:520px;background:#a78bfa;bottom:-160px;right:-140px;animation:float 18s ease-in-out infinite reverse}
+@keyframes float{50%{transform:translate(40px,30px) scale(1.1)}}
+
+/* water drop button */
+.drop-btn{position:relative;display:inline-flex;align-items:center;justify-content:center;padding:16px 30px;border-radius:999px;font-size:15px;font-weight:500;cursor:none;overflow:hidden;border:none;transition:transform .25s cubic-bezier(.34,1.56,.64,1),box-shadow .3s;isolation:isolate;letter-spacing:.01em}
+.drop-btn.primary{background:linear-gradient(135deg,#7fe3ff,#a78bfa);color:#06080f;box-shadow:0 10px 30px -8px rgba(127,227,255,.55),inset 0 1px 0 rgba(255,255,255,.6),inset 0 -8px 16px rgba(0,0,0,.12)}
+.drop-btn.primary:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 18px 45px -8px rgba(127,227,255,.7),inset 0 1px 0 rgba(255,255,255,.7),inset 0 -8px 16px rgba(0,0,0,.15)}
+.drop-btn.ghost{background:rgba(255,255,255,.04);color:inherit;border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(10px)}
+.drop-btn.ghost:hover{background:rgba(127,227,255,.1);border-color:rgba(127,227,255,.4);transform:translateY(-3px)}
+.drop-btn::before{content:"";position:absolute;inset:0;border-radius:inherit;background:radial-gradient(120% 80% at 50% 0%,rgba(255,255,255,.55),transparent 60%);pointer-events:none;mix-blend-mode:overlay;opacity:.7}
+.ripple{position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.7),rgba(127,227,255,.3) 40%,transparent 70%);transform:scale(0);animation:ripple .8s ease-out forwards;pointer-events:none}
+@keyframes ripple{to{transform:scale(1);opacity:0}}
+
+/* sections */
+.section{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:120px 24px}
+.section-head{margin-bottom:48px;max-width:720px}
+.section-head.center{margin:0 auto 48px;text-align:center}
+.kicker{display:inline-block;font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:#7fe3ff;margin-bottom:14px}
+.section-head h2{font-size:clamp(32px,5vw,56px);font-weight:600;letter-spacing:-.02em;line-height:1.05}
+
+/* about */
+.about-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr;grid-template-rows:auto auto;gap:18px}
+.card{padding:28px}
+.bio{grid-row:span 2;display:flex;flex-direction:column;justify-content:center;gap:14px;font-size:16px;line-height:1.7;color:#b9c2d4}
+.bio em{color:#7fe3ff;font-style:normal}
+.skill{display:flex;flex-direction:column;align-items:flex-start;gap:10px;transition:transform .4s cubic-bezier(.2,.8,.2,1)}
+.skill h4{font-size:18px;font-weight:500}
+.skill p{font-size:13px;color:#7a8499}
+@media (max-width:900px){.about-grid{grid-template-columns:1fr 1fr}.bio{grid-column:1/-1;grid-row:auto}}
+@media (max-width:540px){.about-grid{grid-template-columns:1fr}}
+
+/* ring */
+.ring-bg{fill:none;stroke:rgba(255,255,255,.08);stroke-width:5}
+.ring-fg{fill:none;stroke:url(#g);stroke-width:5;stroke-linecap:round;stroke:#7fe3ff;filter:drop-shadow(0 0 6px rgba(127,227,255,.6));transition:stroke-dashoffset 1s ease}
+.ring-text{fill:#e7ecf3;font-size:14px;font-weight:600;font-family:inherit}
+
+/* projects */
+.projects-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+@media (max-width:1000px){.projects-grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:640px){.projects-grid{grid-template-columns:1fr}}
+.project-card{padding:14px;cursor:none;transition:transform .5s cubic-bezier(.2,.8,.2,1),box-shadow .4s}
+.project-card:hover{box-shadow:0 30px 60px -20px rgba(127,227,255,.25),0 0 0 1px rgba(127,227,255,.3)}
+.thumb{position:relative;aspect-ratio:4/3;border-radius:14px;overflow:hidden;display:flex;align-items:flex-end;justify-content:flex-start;padding:18px}
+.thumb-glow{position:absolute;inset:0;background:radial-gradient(circle at 30% 20%,rgba(255,255,255,.4),transparent 50%);mix-blend-mode:overlay}
+.thumb-num{position:relative;font-size:48px;font-weight:700;color:rgba(255,255,255,.85);letter-spacing:-.04em;text-shadow:0 2px 20px rgba(0,0,0,.25)}
+.project-meta{padding:18px 10px 10px}
+.project-meta h3{font-size:20px;font-weight:600;margin-bottom:6px}
+.project-meta p{font-size:14px;color:#8a93a8;margin-bottom:14px}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:11px;padding:4px 10px;border-radius:999px;background:rgba(127,227,255,.08);color:#7fe3ff;border:1px solid rgba(127,227,255,.18)}
+
+/* contact */
+.contact-form{max-width:720px;margin:0 auto;padding:32px;display:flex;flex-direction:column;gap:18px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media (max-width:600px){.row{grid-template-columns:1fr}}
+.contact-form label{display:flex;flex-direction:column;gap:8px}
+.contact-form span{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#7a8499}
+.contact-form input,.contact-form textarea{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:14px 16px;color:inherit;font:inherit;font-size:15px;transition:border-color .25s,background .25s;resize:vertical;cursor:none}
+.contact-form input:focus,.contact-form textarea:focus{outline:none;border-color:rgba(127,227,255,.55);background:rgba(127,227,255,.05)}
+.contact-form .drop-btn{align-self:flex-start;margin-top:8px}
+.socials{display:flex;gap:14px;justify-content:center;margin-top:32px;flex-wrap:wrap}
+.social{padding:12px 22px;border-radius:999px;font-size:14px;transition:transform .25s,color .25s,border-color .25s}
+.social:hover{transform:translateY(-3px);color:#7fe3ff;border-color:rgba(127,227,255,.4)}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .9s cubic-bezier(.2,.8,.2,1),transform .9s cubic-bezier(.2,.8,.2,1)}
+.reveal.in{opacity:1;transform:none}
+
+/* footer */
+.footer{position:relative;z-index:1;display:flex;justify-content:space-between;padding:40px 32px;font-size:12px;color:#5a6480;border-top:1px solid rgba(255,255,255,.05);flex-wrap:wrap;gap:10px}
+
+/* modal */
+.modal{position:fixed;inset:0;z-index:200;background:rgba(2,4,10,.7);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .35s}
+.modal.open{opacity:1;pointer-events:auto}
+.modal-inner{max-width:560px;width:100%;padding:40px;position:relative;transform:scale(.96);transition:transform .4s cubic-bezier(.2,.8,.2,1)}
+.modal.open .modal-inner{transform:scale(1)}
+.modal-close{position:absolute;top:14px;right:18px;background:transparent;border:none;color:inherit;font-size:28px;cursor:none;line-height:1}
+#modal-body h3{font-size:26px;margin-bottom:8px;font-weight:600}
+#modal-body .tech{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:#7fe3ff;margin-bottom:18px}
+#modal-body p{color:#b9c2d4;line-height:1.7}
+`;
