@@ -392,7 +392,7 @@ function Index() {
       {/* CONTACT */}
       <section id="contact" className="section contact">
         <div className="section-head reveal center">
-          <span className="kicker">03 / Contact</span>
+          <span className="kicker">04 / Contact</span>
           <h2>Let's build something <span className="grad">luminous</span>.</h2>
         </div>
         <form
