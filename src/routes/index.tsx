@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
+import beckyPortrait from "@/assets/becky-portrait.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -227,27 +228,63 @@ function Index() {
           <span className="kicker">01 / About</span>
           <h2>A developer obsessed with detail.</h2>
         </div>
-        <div className="about-grid">
-          <div className="glass card bio reveal">
-            <p>
-              I'm Becky — a developer-designer hybrid based on the edge of code and craft. For 6+ years I've shipped
-              interfaces for startups, agencies and ambitious solo founders, blending engineering rigor with
-              cinematic motion design.
-            </p>
-            <p>I care about <em>feel</em>: the milliseconds, the easing, the glow.</p>
-          </div>
-          {[
-            { t: "Frontend", v: 95, d: "React · TS · Vite" },
-            { t: "UI / UX", v: 90, d: "Figma · Systems" },
-            { t: "Motion", v: 88, d: "GSAP · WebGL" },
-            { t: "3D / Shaders", v: 75, d: "Three · GLSL" },
-          ].map((s) => (
-            <div key={s.t} className="glass card skill tilt reveal">
-              <Ring value={s.v} />
-              <h4>{s.t}</h4>
-              <p>{s.d}</p>
+        <div className="about-layout">
+          <div className="portrait-wrap reveal tilt">
+            <div className="portrait-frame">
+              <img
+                src={beckyPortrait}
+                alt="Portrait of Becky Biranu"
+                className="portrait-img"
+                width={1024}
+                height={1024}
+                loading="lazy"
+              />
+              <span className="portrait-glow" />
+              <span className="portrait-ring" />
+              <div className="portrait-badge glass">
+                <span className="pulse-dot" />
+                Available for Q1 2026
+              </div>
             </div>
-          ))}
+          </div>
+          <div className="about-right">
+            <div className="glass card bio reveal">
+              <p>
+                I'm <strong>Becky Biranu</strong> — a creative developer and product designer building
+                next-generation interfaces at the intersection of code, motion and craft. Over the last
+                6+ years I've partnered with venture-backed startups, design studios and ambitious solo
+                founders to ship products used by hundreds of thousands of people.
+              </p>
+              <p>
+                My work lives in the details: typography that breathes, easing curves tuned to the
+                millisecond, shaders that feel like weather. I write production-grade React, design in
+                Figma, and prototype with GSAP, Three.js and WebGL — always chasing that quiet moment
+                where an interface stops feeling like software and starts feeling <em>alive</em>.
+              </p>
+              <p>
+                Currently based between Berlin and Addis Ababa, working remotely with teams worldwide.
+              </p>
+              <div className="bio-stats">
+                <div><strong>60+</strong><span>Shipped products</span></div>
+                <div><strong>6+</strong><span>Years in craft</span></div>
+                <div><strong>14</strong><span>Awwwards & FWA</span></div>
+              </div>
+            </div>
+            <div className="skills-grid">
+              {[
+                { t: "Frontend", v: 95, d: "React · TS · Vite" },
+                { t: "UI / UX", v: 90, d: "Figma · Systems" },
+                { t: "Motion", v: 88, d: "GSAP · WebGL" },
+                { t: "3D / Shaders", v: 75, d: "Three · GLSL" },
+              ].map((s) => (
+                <div key={s.t} className="glass card skill tilt reveal">
+                  <Ring value={s.v} />
+                  <h4>{s.t}</h4>
+                  <p>{s.d}</p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
@@ -474,15 +511,32 @@ body.light #bg-canvas{opacity:.35}
 .section-head h2{font-size:clamp(32px,5vw,56px);font-weight:600;letter-spacing:-.02em;line-height:1.05}
 
 /* about */
-.about-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr;grid-template-rows:auto auto;gap:18px}
+.about-layout{display:grid;grid-template-columns:0.85fr 1.15fr;gap:32px;align-items:start}
 .card{padding:28px}
-.bio{grid-row:span 2;display:flex;flex-direction:column;justify-content:center;gap:14px;font-size:16px;line-height:1.7;color:#b9c2d4}
+.portrait-wrap{position:sticky;top:100px;perspective:1200px}
+.portrait-frame{position:relative;aspect-ratio:4/5;border-radius:28px;overflow:hidden;border:1px solid rgba(127,227,255,.18);box-shadow:0 40px 80px -30px rgba(127,227,255,.35),0 0 0 1px rgba(167,139,250,.12) inset;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+.portrait-img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(1.05) contrast(1.05);transition:transform .8s cubic-bezier(.2,.8,.2,1)}
+.portrait-frame:hover .portrait-img{transform:scale(1.04)}
+.portrait-glow{position:absolute;inset:-40%;background:radial-gradient(circle at 30% 20%,rgba(127,227,255,.35),transparent 55%),radial-gradient(circle at 70% 80%,rgba(167,139,250,.3),transparent 55%);mix-blend-mode:screen;pointer-events:none;animation:portraitGlow 8s ease-in-out infinite}
+.portrait-ring{position:absolute;inset:10px;border-radius:22px;border:1px solid rgba(255,255,255,.08);pointer-events:none}
+@keyframes portraitGlow{0%,100%{opacity:.7;transform:rotate(0deg)}50%{opacity:1;transform:rotate(6deg)}}
+.portrait-badge{position:absolute;left:16px;bottom:16px;display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;font-size:12px;letter-spacing:.08em;color:#e7ecf3;background:rgba(8,12,22,.55);backdrop-filter:blur(14px)}
+.pulse-dot{width:8px;height:8px;border-radius:999px;background:#7fe3ff;box-shadow:0 0 0 0 rgba(127,227,255,.7);animation:pulseDot 1.8s ease-out infinite}
+@keyframes pulseDot{0%{box-shadow:0 0 0 0 rgba(127,227,255,.7)}70%{box-shadow:0 0 0 12px rgba(127,227,255,0)}100%{box-shadow:0 0 0 0 rgba(127,227,255,0)}}
+.about-right{display:flex;flex-direction:column;gap:18px}
+.bio{display:flex;flex-direction:column;gap:14px;font-size:16px;line-height:1.75;color:#b9c2d4}
+.bio strong{color:#e7ecf3;font-weight:600}
 .bio em{color:#7fe3ff;font-style:normal}
+.bio-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:10px;padding-top:20px;border-top:1px solid rgba(255,255,255,.06)}
+.bio-stats div{display:flex;flex-direction:column;gap:4px}
+.bio-stats strong{font-size:24px;font-weight:600;color:#7fe3ff;font-family:'Sora',sans-serif;letter-spacing:-.02em}
+.bio-stats span{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#7a8499}
+.skills-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
 .skill{display:flex;flex-direction:column;align-items:flex-start;gap:10px;transition:transform .4s cubic-bezier(.2,.8,.2,1)}
 .skill h4{font-size:18px;font-weight:500}
 .skill p{font-size:13px;color:#7a8499}
-@media (max-width:900px){.about-grid{grid-template-columns:1fr 1fr}.bio{grid-column:1/-1;grid-row:auto}}
-@media (max-width:540px){.about-grid{grid-template-columns:1fr}}
+@media (max-width:900px){.about-layout{grid-template-columns:1fr}.portrait-wrap{position:relative;top:0;max-width:420px;margin:0 auto}}
+@media (max-width:540px){.skills-grid{grid-template-columns:1fr}.bio-stats{grid-template-columns:1fr 1fr}}
 
 /* ring */
 .ring-bg{fill:none;stroke:rgba(255,255,255,.08);stroke-width:5}
