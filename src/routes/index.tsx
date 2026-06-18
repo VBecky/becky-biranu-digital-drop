@@ -196,6 +196,7 @@ function Index() {
           <a href="#home">Home</a>
           <a href="#about">About</a>
           <a href="#projects">Projects</a>
+          <a href="#blog">Blog</a>
           <a href="#contact">Contact</a>
         </div>
         <button id="theme-toggle" className="theme-toggle" aria-label="Toggle theme">◐</button>
@@ -322,10 +323,76 @@ function Index() {
         </div>
       </section>
 
+      {/* BLOG */}
+      <section id="blog" className="section">
+        <div className="section-head reveal">
+          <span className="kicker">03 / Journal</span>
+          <h2>Notes from the <span className="grad">edge</span>.</h2>
+          <p className="section-sub">Essays, experiments and field notes on motion, shaders and crafting interfaces that feel alive.</p>
+        </div>
+        <div className="blog-grid">
+          {[
+            {
+              cat: "Motion",
+              date: "Mar 12, 2026",
+              read: "6 min",
+              title: "The Physics of Feel: Easing Curves That Breathe",
+              desc: "Why default cubic-bezier curves flatten your UI — and the four custom easings I reach for instead.",
+              hue: "from-cyan-400/40 to-violet-500/30",
+              bg: "linear-gradient(135deg,#0ea5e9 0%,#7c3aed 100%)",
+            },
+            {
+              cat: "WebGL",
+              date: "Feb 28, 2026",
+              read: "11 min",
+              title: "Shader Lighting for People Who Hate Math",
+              desc: "A gentle, visual walk through fragment shaders, normal maps and the magic of rim light.",
+              hue: "from-emerald-400/40 to-cyan-500/30",
+              bg: "linear-gradient(135deg,#10b981 0%,#0ea5e9 100%)",
+            },
+            {
+              cat: "Design Systems",
+              date: "Feb 04, 2026",
+              read: "8 min",
+              title: "Glassmorphism, Reconsidered",
+              desc: "Glass UI is back — here's how to use blur, noise and tinting without making everything feel cheap.",
+              hue: "from-fuchsia-400/40 to-amber-500/30",
+              bg: "linear-gradient(135deg,#d946ef 0%,#f59e0b 100%)",
+            },
+          ].map((post, i) => (
+            <article
+              key={post.title}
+              className="glass blog-card tilt reveal"
+              style={{ animationDelay: `${i * 90}ms` }}
+            >
+              <div className="blog-thumb" style={{ background: post.bg }}>
+                <span className="blog-thumb-glow" />
+                <span className="blog-cat">{post.cat}</span>
+              </div>
+              <div className="blog-meta">
+                <div className="blog-info">
+                  <span>{post.date}</span>
+                  <span className="dot">·</span>
+                  <span>{post.read} read</span>
+                </div>
+                <h3>{post.title}</h3>
+                <p>{post.desc}</p>
+                <a href="#blog" className="blog-link">
+                  Read article <span className="arrow">→</span>
+                </a>
+              </div>
+            </article>
+          ))}
+        </div>
+        <div className="blog-cta reveal">
+          <a href="#blog" className="drop-btn ghost">View all writing</a>
+        </div>
+      </section>
+
       {/* CONTACT */}
       <section id="contact" className="section contact">
         <div className="section-head reveal center">
-          <span className="kicker">03 / Contact</span>
+          <span className="kicker">04 / Contact</span>
           <h2>Let's build something <span className="grad">luminous</span>.</h2>
         </div>
         <form
@@ -509,6 +576,27 @@ body.light #bg-canvas{opacity:.35}
 .section-head.center{margin:0 auto 48px;text-align:center}
 .kicker{display:inline-block;font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:#7fe3ff;margin-bottom:14px}
 .section-head h2{font-size:clamp(32px,5vw,56px);font-weight:600;letter-spacing:-.02em;line-height:1.05}
+.section-sub{margin-top:18px;color:#8a93a8;font-size:15px;line-height:1.7;max-width:560px}
+
+/* blog */
+.blog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+@media (max-width:1000px){.blog-grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:640px){.blog-grid{grid-template-columns:1fr}}
+.blog-card{padding:14px;display:flex;flex-direction:column;cursor:none;transition:transform .5s cubic-bezier(.2,.8,.2,1),box-shadow .4s}
+.blog-card:hover{box-shadow:0 30px 60px -20px rgba(167,139,250,.25),0 0 0 1px rgba(167,139,250,.3)}
+.blog-thumb{position:relative;aspect-ratio:16/10;border-radius:14px;overflow:hidden;display:flex;align-items:flex-start;justify-content:flex-start;padding:14px}
+.blog-thumb-glow{position:absolute;inset:0;background:radial-gradient(circle at 25% 15%,rgba(255,255,255,.45),transparent 55%),radial-gradient(circle at 80% 90%,rgba(0,0,0,.25),transparent 60%);mix-blend-mode:overlay;pointer-events:none}
+.blog-cat{position:relative;font-size:11px;letter-spacing:.22em;text-transform:uppercase;padding:6px 12px;border-radius:999px;background:rgba(8,12,22,.55);backdrop-filter:blur(10px);color:#e7ecf3;border:1px solid rgba(255,255,255,.12)}
+.blog-meta{padding:18px 10px 12px;display:flex;flex-direction:column;gap:10px;flex:1}
+.blog-info{display:flex;gap:8px;font-size:12px;color:#7a8499;letter-spacing:.08em}
+.blog-info .dot{opacity:.5}
+.blog-meta h3{font-size:19px;font-weight:600;line-height:1.3;letter-spacing:-.01em}
+.blog-meta p{font-size:14px;color:#8a93a8;line-height:1.6;flex:1}
+.blog-link{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:#7fe3ff;letter-spacing:.08em;margin-top:6px;transition:gap .3s}
+.blog-link .arrow{transition:transform .3s}
+.blog-card:hover .blog-link{gap:14px}
+.blog-card:hover .blog-link .arrow{transform:translateX(4px)}
+.blog-cta{display:flex;justify-content:center;margin-top:36px}
 
 /* about */
 .about-layout{display:grid;grid-template-columns:0.85fr 1.15fr;gap:32px;align-items:start}
