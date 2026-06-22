@@ -451,9 +451,9 @@ function Index() {
         </form>
         <div className="socials reveal">
           {[
-            { n: "GitHub", h: "https://github.com" },
-            { n: "LinkedIn", h: "https://linkedin.com" },
-            { n: "Email", h: "mailto:becky@biranu.dev" },
+            { n: "GitHub", h: "https://github.com/VBecky/" },
+            { n: "LinkedIn", h: "https://et.linkedin.com/in/bekuma-biranu-470bab2b1" },
+            { n: "Email", h: "mailto:bekumabiranu978@gmail.com" },
           ].map((s) => (
             <a key={s.n} href={s.h} className="social glass">{s.n}</a>
           ))}
@@ -501,6 +501,8 @@ import projBanking from "@/assets/proj-banking.jpg";
 import projEncrypt from "@/assets/proj-encrypt.jpg";
 import projPortfolio from "@/assets/proj-portfolio.jpg";
 import projExpense from "@/assets/proj-expense.jpg";
+import projStudentDashboard from "@/assets/proj-student-dashboard.jpg";
+import projQuiz from "@/assets/proj-quiz.jpg";
 
 const PROJECTS = [
   {
@@ -537,20 +539,25 @@ const PROJECTS = [
     full: "An expense tracker that logs daily spending, groups it by category and visualises budgets at a glance — built to make personal finance feel calm, not anxious.",
     bg: "linear-gradient(135deg,#a855f7,#ec4899,#f59e0b)",
     img: projExpense,
+    link: "https://github.com/VBecky/Expense-tracker",
   },
   {
-    title: "Lumen Type",
-    desc: "Variable typeface playground with shaders.",
-    tech: "WebGL · GLSL · Canvas",
-    full: "An interactive specimen for a variable typeface — every glyph rendered through a custom fragment shader that responds to cursor velocity.",
-    bg: "linear-gradient(135deg,#ec4899,#a855f7,#3b82f6)",
+    title: "Student Dashboard",
+    desc: "Academic dashboard for progress, courses and schedule.",
+    tech: "Python · Tkinter · Data",
+    full: "A student dashboard that centralises grades, attendance, upcoming assignments and course progress in a clean, data-rich interface.",
+    bg: "linear-gradient(135deg,#3b82f6,#8b5cf6,#ec4899)",
+    img: projStudentDashboard,
+    link: "https://github.com/VBecky/Student-Dashboard",
   },
   {
-    title: "Helix Robotics",
-    desc: "Marketing site for an autonomy startup.",
-    tech: "Astro · Motion · MDX",
-    full: "Brand-system, identity rollout and marketing site for a Series-A robotics company. Built around a single hero shader and tight, restrained motion.",
-    bg: "linear-gradient(135deg,#1e293b,#0ea5e9,#22d3ee)",
+    title: "Quize Webapp",
+    desc: "Interactive quiz app with score tracking and timers.",
+    tech: "HTML · CSS · JavaScript",
+    full: "A responsive quiz web application with multiple-choice questions, real-time scoring, progress tracking and a polished game-like experience.",
+    bg: "linear-gradient(135deg,#10b981,#0ea5e9,#6366f1)",
+    img: projQuiz,
+    link: "https://github.com/VBecky/quize-app",
   },
 ];
 
