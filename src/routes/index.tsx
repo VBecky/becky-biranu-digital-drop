@@ -680,6 +680,12 @@ body.light #bg-canvas{opacity:.35}
 .thumb{position:relative;aspect-ratio:4/3;border-radius:14px;overflow:hidden;display:flex;align-items:flex-end;justify-content:flex-start;padding:18px}
 .thumb-glow{position:absolute;inset:0;background:radial-gradient(circle at 30% 20%,rgba(255,255,255,.4),transparent 50%);mix-blend-mode:overlay}
 .thumb-num{position:relative;font-size:48px;font-weight:700;color:rgba(255,255,255,.85);letter-spacing:-.04em;text-shadow:0 2px 20px rgba(0,0,0,.25)}
+.thumb-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .8s cubic-bezier(.2,.8,.2,1)}
+.project-card:hover .thumb-img{transform:scale(1.06)}
+.thumb-live{position:absolute;inset:0;width:100%;height:100%;border:0;background:#0b0e16;transform-origin:top left;transform:scale(.5);width:200%;height:200%;pointer-events:none}
+.project-links{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+.project-link{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:500;color:#7fe3ff;background:rgba(127,227,255,.08);border:1px solid rgba(127,227,255,.25);transition:all .3s;cursor:none}
+.project-link:hover{background:rgba(127,227,255,.18);border-color:rgba(127,227,255,.5);transform:translateY(-1px)}
 .project-meta{padding:18px 10px 10px}
 .project-meta h3{font-size:20px;font-weight:600;margin-bottom:6px}
 .project-meta p{font-size:14px;color:#8a93a8;margin-bottom:14px}
