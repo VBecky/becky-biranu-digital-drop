@@ -296,7 +296,7 @@ function Index() {
           <h2>Projects that move.</h2>
         </div>
         <div className="projects-grid">
-          {PROJECTS.map((p, i) => (
+          {PROJECTS.map((p: any, i) => (
             <article
               key={p.title}
               className="glass project-card tilt reveal"
@@ -307,16 +307,44 @@ function Index() {
             >
               <div className="thumb" style={{ background: p.bg }}>
                 <span className="thumb-glow" />
-                <span className="thumb-num">0{i + 1}</span>
+                {p.live ? (
+                  <iframe
+                    src={p.live}
+                    title={p.title}
+                    className="thumb-live"
+                    loading="lazy"
+                    sandbox="allow-scripts allow-same-origin"
+                  />
+                ) : p.img ? (
+                  <img src={p.img} alt={p.title} loading="lazy" className="thumb-img" />
+                ) : (
+                  <span className="thumb-num">0{i + 1}</span>
+                )}
               </div>
               <div className="project-meta">
                 <h3>{p.title}</h3>
                 <p>{p.desc}</p>
                 <div className="tags">
-                  {p.tech.split(" · ").map((t) => (
+                  {p.tech.split(" · ").map((t: string) => (
                     <span key={t} className="tag">{t}</span>
                   ))}
                 </div>
+                {(p.link || p.live) && (
+                  <div className="project-links">
+                    {p.link && (
+                      <a href={p.link} target="_blank" rel="noreferrer" className="project-link" onClick={(e) => e.stopPropagation()}>
+                        <span>GitHub</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M7 17L17 7M9 7h8v8"/></svg>
+                      </a>
+                    )}
+                    {p.live && (
+                      <a href={p.live} target="_blank" rel="noreferrer" className="project-link" onClick={(e) => e.stopPropagation()}>
+                        <span>Live</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M7 17L17 7M9 7h8v8"/></svg>
+                      </a>
+                    )}
+                  </div>
+                )}
               </div>
             </article>
           ))}
@@ -469,34 +497,46 @@ function Ring({ value }: { value: number }) {
   );
 }
 
+import projBanking from "@/assets/proj-banking.jpg";
+import projEncrypt from "@/assets/proj-encrypt.jpg";
+import projPortfolio from "@/assets/proj-portfolio.jpg";
+import projExpense from "@/assets/proj-expense.jpg";
+
 const PROJECTS = [
   {
-    title: "Nebula Finance",
-    desc: "Realtime trading dashboard with liquid data viz.",
-    tech: "React · WebGL · D3",
-    full: "A high-frequency trading interface built around liquid data visualisation, custom WebGL charts and a bespoke motion language. Shipped to 12k+ daily traders.",
+    title: "Banking System",
+    desc: "Tkinter desktop banking app with secure accounts.",
+    tech: "Python · Tkinter · SQLite",
+    full: "A full-featured desktop banking system built in Python with Tkinter. Handles account creation, deposits, withdrawals, transfers and transaction history with a clean, focused GUI.",
     bg: "linear-gradient(135deg,#0ea5e9,#6366f1,#a855f7)",
+    img: projBanking,
+    link: "https://github.com/VBecky/banking-system",
   },
   {
-    title: "Aurora OS",
-    desc: "Concept operating system with spatial UI.",
-    tech: "Three.js · GSAP · TS",
-    full: "An exploration of post-window computing — spatial panels, gestural navigation and an ambient soundscape that reacts to focus state.",
-    bg: "linear-gradient(135deg,#14b8a6,#22d3ee,#60a5fa)",
+    title: "Encrypt / Decrypt File",
+    desc: "Tkinter file encryptor with strong symmetric crypto.",
+    tech: "Python · Tkinter · Cryptography",
+    full: "A desktop file encryption tool built with Python and Tkinter. Encrypts and decrypts any file format with a generated key, wrapped in a minimal, security-first interface.",
+    bg: "linear-gradient(135deg,#10b981,#22d3ee,#0ea5e9)",
+    img: projEncrypt,
+    link: "https://github.com/VBecky/File-encryptor",
   },
   {
-    title: "Drift Studio",
-    desc: "Awwwards-winning agency site, fluid scroll.",
-    tech: "Next · Lenis · Shader",
-    full: "Editorial-meets-experiment site for a Berlin design studio. SOTD on Awwwards, FWA of the day, and a 98 Lighthouse score.",
-    bg: "linear-gradient(135deg,#f43f5e,#f59e0b,#fbbf24)",
+    title: "Portfolio",
+    desc: "Personal developer portfolio — live on the web.",
+    tech: "HTML · CSS · JavaScript",
+    full: "A personal portfolio website showcasing projects, skills and journey. Built from scratch with vanilla HTML, CSS and JavaScript — embedded live below.",
+    bg: "linear-gradient(135deg,#f43f5e,#a855f7,#3b82f6)",
+    live: "https://vbecky.github.io/beckyweb/",
+    link: "https://github.com/VBecky/beckyweb",
   },
   {
-    title: "Pulse Health",
-    desc: "Wearable companion app with ambient UI.",
-    tech: "React Native · Reanimated",
-    full: "Calm-tech companion for a sleep wearable. Glanceable, never anxious — uses ambient color states instead of numbers when possible.",
-    bg: "linear-gradient(135deg,#10b981,#06b6d4,#8b5cf6)",
+    title: "Expense Tracker",
+    desc: "Track spending, budgets and category breakdowns.",
+    tech: "Python · Tkinter · Charts",
+    full: "An expense tracker that logs daily spending, groups it by category and visualises budgets at a glance — built to make personal finance feel calm, not anxious.",
+    bg: "linear-gradient(135deg,#a855f7,#ec4899,#f59e0b)",
+    img: projExpense,
   },
   {
     title: "Lumen Type",
@@ -640,6 +680,12 @@ body.light #bg-canvas{opacity:.35}
 .thumb{position:relative;aspect-ratio:4/3;border-radius:14px;overflow:hidden;display:flex;align-items:flex-end;justify-content:flex-start;padding:18px}
 .thumb-glow{position:absolute;inset:0;background:radial-gradient(circle at 30% 20%,rgba(255,255,255,.4),transparent 50%);mix-blend-mode:overlay}
 .thumb-num{position:relative;font-size:48px;font-weight:700;color:rgba(255,255,255,.85);letter-spacing:-.04em;text-shadow:0 2px 20px rgba(0,0,0,.25)}
+.thumb-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .8s cubic-bezier(.2,.8,.2,1)}
+.project-card:hover .thumb-img{transform:scale(1.06)}
+.thumb-live{position:absolute;inset:0;width:100%;height:100%;border:0;background:#0b0e16;transform-origin:top left;transform:scale(.5);width:200%;height:200%;pointer-events:none}
+.project-links{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+.project-link{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:500;color:#7fe3ff;background:rgba(127,227,255,.08);border:1px solid rgba(127,227,255,.25);transition:all .3s;cursor:none}
+.project-link:hover{background:rgba(127,227,255,.18);border-color:rgba(127,227,255,.5);transform:translateY(-1px)}
 .project-meta{padding:18px 10px 10px}
 .project-meta h3{font-size:20px;font-weight:600;margin-bottom:6px}
 .project-meta p{font-size:14px;color:#8a93a8;margin-bottom:14px}
