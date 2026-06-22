@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
-import beckyPortrait from "@/assets/becky-portrait.jpg";
+import beckyPortrait from "@/assets/becky-portrait.png.asset.json";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -233,7 +234,7 @@ function Index() {
           <div className="portrait-wrap reveal tilt">
             <div className="portrait-frame">
               <img
-                src={beckyPortrait}
+                src={beckyPortrait.url}
                 alt="Portrait of Becky Biranu"
                 className="portrait-img"
                 width={1024}
