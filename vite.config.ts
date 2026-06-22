@@ -12,4 +12,10 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  // This tells Nitro to build for Vercel instead of Cloudflare when deploying
+  vite: {
+    nitro: {
+      preset: process.env.VERCEL ? "vercel" : "cloudflare-pages"
+    }
+  }
 });
