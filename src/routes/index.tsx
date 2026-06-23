@@ -6,7 +6,7 @@ import beckyPortrait from "@/assets/becky-portrait.png.asset.json";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Becky Biranu — Creative Developer & Futuristic UI Designer" },
+      { title: "Becky Biranu — Creative Developer & Video Editor" },
       {
         name: "description",
         content:
@@ -210,9 +210,9 @@ function Index() {
           <h1 className="hero-title reveal">
             Hi, I'm <span className="grad">Becky Biranu</span>
           </h1>
-          <p className="hero-sub reveal">Creative Developer & Futuristic UI Designer</p>
+          <p className="hero-sub reveal">Creative Developer & Video Editor</p>
           <p className="hero-desc reveal">
-            Crafting next-generation digital experiences where motion, light and liquid interaction meet.
+            I build responsive, functional web applications using modern technologies. I focus on creating clean, efficient, and user-friendly digital experiences.
           </p>
           <div className="hero-ctas reveal">
             <a href="#projects" className="drop-btn primary">View Projects</a>
@@ -252,32 +252,17 @@ function Index() {
           <div className="about-right">
             <div className="glass card bio reveal">
               <p>
-                I'm <strong>Becky Biranu</strong> — a creative developer and product designer building
-                next-generation interfaces at the intersection of code, motion and craft. Over the last
-                6+ years I've partnered with venture-backed startups, design studios and ambitious solo
-                founders to ship products used by hundreds of thousands of people.
+                Hi, I'm <strong>Becky</strong> — a frontend and backend developer. I build responsive, user-focused web applications using HTML, CSS, JavaScript, PHP, MySQL, and Python. I work across both frontend and backend development, creating complete, functional websites with clean interfaces and reliable server-side logic.
               </p>
               <p>
-                My work lives in the details: typography that breathes, easing curves tuned to the
-                millisecond, shaders that feel like weather. I write production-grade React, design in
-                Figma, and prototype with GSAP, Three.js and WebGL — always chasing that quiet moment
-                where an interface stops feeling like software and starts feeling <em>alive</em>.
+                My focus is on building practical, efficient, and maintainable web solutions. I enjoy turning ideas into working products, from simple websites to database-driven applications. I'm currently looking for freelance opportunities and full-time roles where I can contribute, grow my skills, and work on real-world projects.
               </p>
-              <p>
-                Currently based between Berlin and Addis Ababa, working remotely with teams worldwide.
-              </p>
-              <div className="bio-stats">
-                <div><strong>60+</strong><span>Shipped products</span></div>
-                <div><strong>6+</strong><span>Years in craft</span></div>
-                <div><strong>14</strong><span>Awwwards & FWA</span></div>
-              </div>
             </div>
             <div className="skills-grid">
               {[
-                { t: "Frontend", v: 95, d: "React · TS · Vite" },
-                { t: "UI / UX", v: 90, d: "Figma · Systems" },
-                { t: "Motion", v: 88, d: "GSAP · WebGL" },
-                { t: "3D / Shaders", v: 75, d: "Three · GLSL" },
+                { t: "Frontend", v: 85, d: "HTML · CSS · JavaScript" },
+                { t: "Backend", v: 80, d: "Python · SQL" },
+                { t: "Automation", v: 78, d: "Selenium · WebScraping" },
               ].map((s) => (
                 <div key={s.t} className="glass card skill tilt reveal">
                   <Ring value={s.v} />
@@ -647,7 +632,7 @@ body.light #bg-canvas{opacity:.35}
 .blog-cta{display:flex;justify-content:center;margin-top:36px}
 
 /* about */
-.about-layout{display:grid;grid-template-columns:0.85fr 1.15fr;gap:32px;align-items:start}
+.about-layout{display:grid;grid-template-columns:0.7fr 1.3fr;gap:32px;align-items:start}
 .card{padding:28px}
 .portrait-wrap{position:sticky;top:100px;perspective:1200px}
 .portrait-frame{position:relative;aspect-ratio:4/5;border-radius:28px;overflow:hidden;border:1px solid rgba(127,227,255,.18);box-shadow:0 40px 80px -30px rgba(127,227,255,.35),0 0 0 1px rgba(167,139,250,.12) inset;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.2,.8,.2,1)}
