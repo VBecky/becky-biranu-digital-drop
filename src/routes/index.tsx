@@ -210,9 +210,9 @@ function Index() {
           <h1 className="hero-title reveal">
             Hi, I'm <span className="grad">Becky Biranu</span>
           </h1>
-          <p className="hero-sub reveal">Creative Developer & Futuristic UI Designer</p>
+          <p className="hero-sub reveal">Creative Developer & Video Editor</p>
           <p className="hero-desc reveal">
-            Crafting next-generation digital experiences where motion, light and liquid interaction meet.
+            I build responsive, functional web applications using modern technologies. I focus on creating clean, efficient, and user-friendly digital experiences.
           </p>
           <div className="hero-ctas reveal">
             <a href="#projects" className="drop-btn primary">View Projects</a>
