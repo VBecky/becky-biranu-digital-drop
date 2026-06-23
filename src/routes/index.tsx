@@ -488,6 +488,141 @@ const PROJECTS = [
   },
 ];
 
+const DEMO_POSTS: BlogPost[] = [
+  {
+    id: "demo-1",
+    title: "The Physics of Feel: Easing Curves That Breathe",
+    excerpt: "Why default cubic-bezier curves flatten your UI — and the four custom easings I reach for instead.",
+    content: "<p>Default easings flatten motion. Here are four curves I reach for to make interfaces feel alive.</p>",
+    image: "",
+    status: "published",
+    createdAt: Date.now() - 1000 * 60 * 60 * 24 * 10,
+    updatedAt: Date.now() - 1000 * 60 * 60 * 24 * 10,
+  },
+  {
+    id: "demo-2",
+    title: "Shader Lighting for People Who Hate Math",
+    excerpt: "A gentle, visual walk through fragment shaders, normal maps and the magic of rim light.",
+    content: "<p>You don't need a math degree to write shaders. Let's build intuition first.</p>",
+    image: "",
+    status: "published",
+    createdAt: Date.now() - 1000 * 60 * 60 * 24 * 20,
+    updatedAt: Date.now() - 1000 * 60 * 60 * 24 * 20,
+  },
+  {
+    id: "demo-3",
+    title: "Glassmorphism, Reconsidered",
+    excerpt: "Glass UI is back — here's how to use blur, noise and tinting without making everything feel cheap.",
+    content: "<p>Glassmorphism, done right, is about restraint. Here's the recipe.</p>",
+    image: "",
+    status: "published",
+    createdAt: Date.now() - 1000 * 60 * 60 * 24 * 30,
+    updatedAt: Date.now() - 1000 * 60 * 60 * 24 * 30,
+  },
+];
+
+const GRADIENTS = [
+  "linear-gradient(135deg,#0ea5e9 0%,#7c3aed 100%)",
+  "linear-gradient(135deg,#10b981 0%,#0ea5e9 100%)",
+  "linear-gradient(135deg,#d946ef 0%,#f59e0b 100%)",
+  "linear-gradient(135deg,#f43f5e 0%,#a855f7 100%)",
+  "linear-gradient(135deg,#22d3ee 0%,#6366f1 100%)",
+];
+
+function formatDate(ts: number) {
+  return new Date(ts).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+}
+
+function BlogSection() {
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [active, setActive] = useState<BlogPost | null>(null);
+  const [popup, setPopup] = useState<string | null>(null);
+
+  useEffect(() => {
+    const load = () => {
+      const stored = blogStore.published();
+      setPosts(stored.length ? stored : DEMO_POSTS);
+    };
+    load();
+    window.addEventListener("blog:updated", load);
+    return () => window.removeEventListener("blog:updated", load);
+  }, []);
+
+  const openPost = (p: BlogPost) => {
+    setActive(p);
+    if (p.popup && p.popup.trim()) setPopup(p.popup);
+  };
+
+  return (
+    <>
+      <section id="blog" className="section">
+        <div className="section-head reveal">
+          <span className="kicker">03 / Journal</span>
+          <h2>Notes from the <span className="grad">edge</span>.</h2>
+          <p className="section-sub">Essays, experiments and field notes on motion, shaders and crafting interfaces that feel alive.</p>
+        </div>
+        <div className="blog-grid">
+          {posts.map((post, i) => (
+            <article
+              key={post.id}
+              className="glass blog-card tilt reveal"
+              onClick={() => openPost(post)}
+              style={{ animationDelay: `${i * 90}ms` }}
+            >
+              <div
+                className="blog-thumb"
+                style={{
+                  background: post.image ? `url(${post.image}) center/cover` : GRADIENTS[i % GRADIENTS.length],
+                }}
+              >
+                <span className="blog-thumb-glow" />
+                <span className="blog-cat">Journal</span>
+              </div>
+              <div className="blog-meta">
+                <div className="blog-info">
+                  <span>{formatDate(post.createdAt)}</span>
+                </div>
+                <h3>{post.title}</h3>
+                <p>{post.excerpt}</p>
+                <span className="blog-link">
+                  Read article <span className="arrow">→</span>
+                </span>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {active && (
+        <div className="modal open" onClick={(e) => { if (e.target === e.currentTarget) setActive(null); }}>
+          <div className="modal-inner glass" style={{ maxWidth: 720 }}>
+            <button className="modal-close" onClick={() => setActive(null)}>×</button>
+            {active.image && (
+              <img src={active.image} alt={active.title} style={{ width: "100%", borderRadius: 14, marginBottom: 18, maxHeight: 360, objectFit: "cover" }} />
+            )}
+            <h3 style={{ fontSize: 28, marginBottom: 8 }}>{active.title}</h3>
+            <p style={{ fontSize: 12, letterSpacing: ".2em", textTransform: "uppercase", color: "#7fe3ff", marginBottom: 18 }}>
+              {formatDate(active.createdAt)}
+            </p>
+            <div style={{ color: "#b9c2d4", lineHeight: 1.7 }} dangerouslySetInnerHTML={{ __html: active.content }} />
+          </div>
+        </div>
+      )}
+
+      {popup && (
+        <div className="modal open" style={{ zIndex: 300 }} onClick={(e) => { if (e.target === e.currentTarget) setPopup(null); }}>
+          <div className="modal-inner glass" style={{ maxWidth: 440, textAlign: "center" }}>
+            <button className="modal-close" onClick={() => setPopup(null)}>×</button>
+            <h3 style={{ fontSize: 22, marginBottom: 14 }}>A note from Becky</h3>
+            <p style={{ color: "#b9c2d4", lineHeight: 1.7, marginBottom: 20 }}>{popup}</p>
+            <button className="drop-btn primary" onClick={() => setPopup(null)}>Got it</button>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
 const CSS = `
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{background:#05060a;color:#e7ecf3;font-family:'Sora','Space Grotesk',Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden;cursor:none}
