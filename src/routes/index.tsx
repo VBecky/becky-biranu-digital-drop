@@ -1,6 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import beckyPortrait from "@/assets/becky-portrait.png.asset.json";
+import { blogStore, type BlogPost } from "@/lib/blog-store";
+
+
 
 
 export const Route = createFileRoute("/")({
