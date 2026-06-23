@@ -6,7 +6,7 @@ import beckyPortrait from "@/assets/becky-portrait.png.asset.json";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Becky Biranu — Creative Developer & Futuristic UI Designer" },
+      { title: "Becky Biranu — Creative Developer & Video Editor" },
       {
         name: "description",
         content:
