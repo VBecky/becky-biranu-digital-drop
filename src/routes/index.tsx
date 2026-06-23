@@ -632,7 +632,7 @@ body.light #bg-canvas{opacity:.35}
 .blog-cta{display:flex;justify-content:center;margin-top:36px}
 
 /* about */
-.about-layout{display:grid;grid-template-columns:0.85fr 1.15fr;gap:32px;align-items:start}
+.about-layout{display:grid;grid-template-columns:0.7fr 1.3fr;gap:32px;align-items:start}
 .card{padding:28px}
 .portrait-wrap{position:sticky;top:100px;perspective:1200px}
 .portrait-frame{position:relative;aspect-ratio:4/5;border-radius:28px;overflow:hidden;border:1px solid rgba(127,227,255,.18);box-shadow:0 40px 80px -30px rgba(127,227,255,.35),0 0 0 1px rgba(167,139,250,.12) inset;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.2,.8,.2,1)}
