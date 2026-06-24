@@ -14,7 +14,105 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      blog_posts: {
+        Row: {
+          content: string
+          created_at: string
+          excerpt: string
+          id: string
+          image_url: string
+          popup: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content?: string
+          created_at?: string
+          excerpt?: string
+          id?: string
+          image_url?: string
+          popup?: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          excerpt?: string
+          id?: string
+          image_url?: string
+          popup?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      projects: {
+        Row: {
+          bg: string
+          created_at: string
+          description: string
+          full_text: string
+          id: string
+          image_url: string
+          link: string
+          live: string
+          sort_order: number
+          tech: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          bg?: string
+          created_at?: string
+          description?: string
+          full_text?: string
+          id?: string
+          image_url?: string
+          link?: string
+          live?: string
+          sort_order?: number
+          tech?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          bg?: string
+          created_at?: string
+          description?: string
+          full_text?: string
+          id?: string
+          image_url?: string
+          link?: string
+          live?: string
+          sort_order?: number
+          tech?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      site_content: {
+        Row: {
+          data: Json
+          key: string
+          updated_at: string
+        }
+        Insert: {
+          data?: Json
+          key: string
+          updated_at?: string
+        }
+        Update: {
+          data?: Json
+          key?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
