@@ -664,6 +664,9 @@ body.light #bg-canvas{opacity:.35}
 .blog-card:hover .blog-link{gap:14px}
 .blog-card:hover .blog-link .arrow{transform:translateX(4px)}
 .blog-cta{display:flex;justify-content:center;margin-top:36px}
+.blog-card-text .project-meta{padding:22px 14px 16px;display:flex;flex-direction:column;gap:10px}
+.blog-snippet{display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;color:#8a93a8;font-size:14px;line-height:1.6}
+.blog-empty{max-width:520px;margin:0 auto;padding:40px;text-align:center;color:#8a93a8;font-size:15px}
 
 /* about */
 .about-layout{display:grid;grid-template-columns:0.7fr 1.3fr;gap:32px;align-items:start}
