@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import { adminAuth } from "@/lib/blog-store";
+import { adminAuth } from "@/lib/content-store";
+import { adminVerifyPassword } from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/admin-login")({
   head: () => ({ meta: [{ title: "Admin" }, { name: "robots", content: "noindex,nofollow" }] }),
@@ -12,17 +13,28 @@ function AdminLogin() {
   const [u, setU] = useState("");
   const [p, setP] = useState("");
   const [err, setErr] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (adminAuth.isAuthed()) navigate({ to: "/admin" });
   }, [navigate]);
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (adminAuth.login(u, p)) {
-      navigate({ to: "/admin" });
-    } else {
-      setErr("Invalid credentials");
+    setErr("");
+    setLoading(true);
+    try {
+      const res = await adminVerifyPassword({ data: { username: u, password: p } });
+      if (res.ok) {
+        adminAuth.setPassword(p);
+        navigate({ to: "/admin" });
+      } else {
+        setErr("Invalid credentials");
+      }
+    } catch {
+      setErr("Sign-in failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -40,7 +52,7 @@ function AdminLogin() {
           <input type="password" style={styles.input} value={p} onChange={(e) => setP(e.target.value)} />
         </label>
         {err && <div style={styles.err}>{err}</div>}
-        <button type="submit" style={styles.btn}>Sign in</button>
+        <button type="submit" style={styles.btn} disabled={loading}>{loading ? "..." : "Sign in"}</button>
       </form>
     </div>
   );
