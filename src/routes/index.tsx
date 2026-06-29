@@ -515,6 +515,11 @@ function BlogSection() {
                   onClick={() => openPost(post)}
                   style={{ animationDelay: `${i * 90}ms`, cursor: "pointer" }}
                 >
+                  {post.image_url ? (
+                    <div className="project-thumb">
+                      <img src={post.image_url} alt={post.title} loading="lazy" className="thumb-img" />
+                    </div>
+                  ) : null}
                   <div className="project-meta">
                     <p className="tech" style={{ fontSize: 12, letterSpacing: ".2em", textTransform: "uppercase", color: "#7fe3ff", marginBottom: 10 }}>
                       {formatDate(post.created_at)}
@@ -536,6 +541,9 @@ function BlogSection() {
         <div className="modal open" onClick={(e) => { if (e.target === e.currentTarget) setActive(null); }}>
           <div className="modal-inner glass" style={{ maxWidth: 720 }}>
             <button className="modal-close" onClick={() => setActive(null)}>×</button>
+            {active.image_url && (
+              <img src={active.image_url} alt={active.title} style={{ width: "100%", borderRadius: 14, marginBottom: 18, maxHeight: 360, objectFit: "cover" }} />
+            )}
             <h3 style={{ fontSize: 28, marginBottom: 8 }}>{active.title}</h3>
             <p style={{ fontSize: 12, letterSpacing: ".2em", textTransform: "uppercase", color: "#7fe3ff", marginBottom: 18 }}>
               {formatDate(active.created_at)}
