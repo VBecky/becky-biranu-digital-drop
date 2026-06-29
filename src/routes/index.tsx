@@ -170,6 +170,41 @@ function Index() {
     };
   }, []);
 
+  // ===== 3D Tilt (re-attach when async cards mount) =====
+  useEffect(() => {
+    const cleanups: Array<() => void> = [];
+    document.querySelectorAll<HTMLElement>(".tilt").forEach((el) => {
+      const onMove = (e: MouseEvent) => {
+        const r = el.getBoundingClientRect();
+        const px = (e.clientX - r.left) / r.width - 0.5;
+        const py = (e.clientY - r.top) / r.height - 0.5;
+        el.style.transform = `perspective(900px) rotateY(${px * 10}deg) rotateX(${-py * 10}deg) translateY(-4px)`;
+        const inner = el.querySelector<HTMLElement>(".portrait-frame, .thumb");
+        if (inner) inner.style.transform = `translateZ(30px)`;
+      };
+      const onLeave = () => {
+        el.style.transform = "";
+        const inner = el.querySelector<HTMLElement>(".portrait-frame, .thumb");
+        if (inner) inner.style.transform = "";
+      };
+      el.addEventListener("mousemove", onMove);
+      el.addEventListener("mouseleave", onLeave);
+      cleanups.push(() => {
+        el.removeEventListener("mousemove", onMove);
+        el.removeEventListener("mouseleave", onLeave);
+      });
+    });
+    // re-observe new reveal elements as well
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach((en) => en.isIntersecting && en.target.classList.add("in")),
+      { threshold: 0.12 },
+    );
+    document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+    cleanups.push(() => io.disconnect());
+    return () => cleanups.forEach((c) => c());
+  }, [projects, about]);
+
+
   return (
     <>
       <style>{CSS}</style>
