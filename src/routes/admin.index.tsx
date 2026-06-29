@@ -129,6 +129,15 @@ function BlogEditor({ post, onDone, onCancel }: { post: Partial<BlogPost>; onDon
       <label style={s.label}><span>Content (HTML supported)</span>
         <textarea style={s.textarea} rows={12} value={p.content || ""} onChange={(e) => upd("content", e.target.value)} />
       </label>
+      <label style={s.label}><span>Cover Image</span>
+        <input type="file" accept="image/*" onChange={async (e) => {
+          const f = e.target.files?.[0];
+          if (!f) return;
+          upd("image_url", await fileToDataUrl(f));
+        }} style={{ color: "#9aa6bd" }} />
+        {p.image_url && <img src={p.image_url} alt="" style={{ marginTop: 10, maxWidth: 240, borderRadius: 10 }} />}
+        {p.image_url && <button type="button" style={{ ...s.ghostBtn, marginTop: 8 }} onClick={() => upd("image_url", "")}>Remove image</button>}
+      </label>
       <label style={s.label}><span>Optional Popup Message</span>
         <textarea style={s.textarea} rows={3} value={p.popup || ""} onChange={(e) => upd("popup", e.target.value)} placeholder="If filled, shown as popup when opening article" />
       </label>
