@@ -380,6 +380,7 @@ function Index() {
                   user_id: "L3Ps1-ihRB72OQToc",
                   template_params: {
                     from_name: data.get("name"),
+                    user_email: data.get("email"),
                     from_email: data.get("email"),
                     message: data.get("message"),
                     reply_to: data.get("email"),
