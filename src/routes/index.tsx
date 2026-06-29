@@ -367,6 +367,7 @@ function Index() {
             const form = e.currentTarget;
             const btn = form.querySelector(".drop-btn") as HTMLButtonElement;
             const data = new FormData(form);
+            const userEmail = String(data.get("user_email") || "").trim();
             const original = btn.textContent;
             btn.disabled = true;
             btn.textContent = "Sending…";
@@ -380,10 +381,10 @@ function Index() {
                   user_id: "L3Ps1-ihRB72OQToc",
                   template_params: {
                     from_name: data.get("name"),
-                    user_email: data.get("email"),
-                    from_email: data.get("email"),
+                    user_email: userEmail,
+                    from_email: userEmail,
                     message: data.get("message"),
-                    reply_to: data.get("email"),
+                    reply_to: userEmail,
                   },
                 }),
               });
@@ -408,7 +409,7 @@ function Index() {
             </label>
             <label>
               <span>Email</span>
-              <input required name="email" type="email" placeholder="you@domain.com" />
+              <input required name="user_email" type="email" placeholder="you@domain.com" />
             </label>
           </div>
           <label>
