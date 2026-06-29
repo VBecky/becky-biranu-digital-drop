@@ -362,30 +362,61 @@ function Index() {
         </div>
         <form
           className="glass contact-form reveal"
-          onSubmit={(e) => {
+          onSubmit={async (e) => {
             e.preventDefault();
-            const btn = e.currentTarget.querySelector(".drop-btn") as HTMLElement;
-            btn.textContent = "Sent ✓";
-            (e.currentTarget as HTMLFormElement).reset();
-            setTimeout(() => (btn.textContent = "Send Message"), 2200);
+            const form = e.currentTarget;
+            const btn = form.querySelector(".drop-btn") as HTMLButtonElement;
+            const data = new FormData(form);
+            const original = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = "Sending…";
+            try {
+              const res = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  service_id: "service_gl5ibkm",
+                  template_id: "template_4qq1m6t",
+                  user_id: "L3Ps1-ihRB72OQToc",
+                  template_params: {
+                    from_name: data.get("name"),
+                    from_email: data.get("email"),
+                    message: data.get("message"),
+                    reply_to: data.get("email"),
+                  },
+                }),
+              });
+              if (!res.ok) throw new Error(await res.text());
+              btn.textContent = "Sent ✓";
+              form.reset();
+            } catch (err) {
+              console.error(err);
+              btn.textContent = "Failed — retry";
+            } finally {
+              setTimeout(() => {
+                btn.textContent = original;
+                btn.disabled = false;
+              }, 2400);
+            }
           }}
         >
           <div className="row">
             <label>
               <span>Name</span>
-              <input required type="text" placeholder="Your name" />
+              <input required name="name" type="text" placeholder="Your name" />
             </label>
             <label>
               <span>Email</span>
-              <input required type="email" placeholder="you@domain.com" />
+              <input required name="email" type="email" placeholder="you@domain.com" />
             </label>
           </div>
           <label>
             <span>Message</span>
-            <textarea required rows={5} placeholder="Tell me about your project…" />
+            <textarea required name="message" rows={5} placeholder="Tell me about your project…" />
           </label>
           <button className="drop-btn primary" type="submit">Send Message</button>
         </form>
+
         <div className="socials reveal">
           {[
             { n: "GitHub", h: "https://github.com/VBecky/" },
