@@ -515,6 +515,11 @@ function BlogSection() {
                   onClick={() => openPost(post)}
                   style={{ animationDelay: `${i * 90}ms`, cursor: "pointer" }}
                 >
+                  {post.image_url ? (
+                    <div className="project-thumb">
+                      <img src={post.image_url} alt={post.title} loading="lazy" className="thumb-img" />
+                    </div>
+                  ) : null}
                   <div className="project-meta">
                     <p className="tech" style={{ fontSize: 12, letterSpacing: ".2em", textTransform: "uppercase", color: "#7fe3ff", marginBottom: 10 }}>
                       {formatDate(post.created_at)}
