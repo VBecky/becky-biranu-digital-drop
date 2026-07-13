@@ -575,6 +575,14 @@ html,body{background:#05060a;color:#e7ecf3;font-family:'Sora','Space Grotesk',In
 body.light{background:#f4f6fb;color:#0b0e16}
 body.light .glass{background:rgba(255,255,255,0.55);border-color:rgba(0,0,0,0.06)}
 body.light .nav{background:rgba(255,255,255,0.6)}
+body.light .hero-sub,body.light .bio{color:#2a3145}
+body.light .hero-desc,body.light .section-sub,body.light .blog-snippet,body.light .blog-empty,body.light .project-meta p,body.light .skill p,body.light .contact-form span{color:#4a5468}
+body.light .scroll-hint,body.light .footer{color:#5a6480}
+body.light .bio strong{color:#0b0e16}
+body.light .portrait-badge{color:#0b0e16;background:rgba(255,255,255,.7)}
+body.light .theme-toggle{border-color:rgba(0,0,0,.15)}
+body.light .nav-links a{color:#0b0e16}
+body.light #cursor{border-color:rgba(10,20,40,.6)}
 a{color:inherit;text-decoration:none}
 img{max-width:100%;display:block}
 
