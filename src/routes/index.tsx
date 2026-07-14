@@ -779,13 +779,34 @@ body.light #bg-canvas{opacity:.35}
 .section-head h2{font-size:clamp(32px,5vw,56px);font-weight:600;letter-spacing:-.02em;line-height:1.05}
 .section-sub{margin-top:18px;color:#8a93a8;font-size:15px;line-height:1.7;max-width:560px}
 
-.blog-link{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:#7fe3ff;letter-spacing:.08em;margin-top:6px;transition:gap .3s}
+.blog-link{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#7fe3ff;letter-spacing:.06em;transition:gap .3s}
 .blog-link .arrow{transition:transform .3s}
-.project-card:hover .blog-link{gap:14px}
+.project-card:hover .blog-link{gap:12px}
 .project-card:hover .blog-link .arrow{transform:translateX(4px)}
-.blog-card-text .project-meta{padding:22px 14px 16px;display:flex;flex-direction:column;gap:10px}
-.blog-snippet{display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;color:#8a93a8;font-size:14px;line-height:1.6}
 .blog-empty{max-width:520px;margin:0 auto;padding:40px;text-align:center;color:#8a93a8;font-size:15px}
+
+.blog-card{padding:0;overflow:hidden;display:flex;flex-direction:column;aspect-ratio:1/1.15}
+.blog-thumb{position:relative;width:100%;aspect-ratio:1/1;overflow:hidden;background:linear-gradient(135deg,#0ea5e9,#6366f1,#a855f7);flex-shrink:0}
+.blog-thumb .thumb-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .8s cubic-bezier(.2,.8,.2,1)}
+.blog-card:hover .thumb-img{transform:scale(1.06)}
+.blog-thumb-placeholder{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:48px;opacity:.6}
+.blog-body{padding:14px 16px 14px;display:flex;flex-direction:column;gap:6px;flex:1;min-height:0}
+.blog-date{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#7fe3ff;margin:0}
+.blog-title{font-size:16px;font-weight:600;line-height:1.25;margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.blog-snippet{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:#8a93a8;font-size:12.5px;line-height:1.5;margin:0}
+.blog-footer{margin-top:auto;padding-top:8px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.like-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;border:1px solid rgba(255,120,180,.3);background:rgba(255,120,180,.08);color:#ffb3d1;font-size:12px;cursor:pointer;transition:all .25s;font-family:inherit}
+.like-btn:hover:not(:disabled){background:rgba(255,120,180,.18);transform:translateY(-1px)}
+.like-btn.liked{background:rgba(255,80,140,.22);border-color:rgba(255,80,140,.55);color:#ff7fb0}
+.like-btn .heart{font-size:14px;line-height:1}
+.like-btn:disabled{cursor:default}
+.comment-input{width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(127,227,255,.18);background:rgba(8,12,22,.5);color:#e6ecf8;font-family:inherit;font-size:14px;resize:vertical;outline:none;transition:border-color .2s}
+.comment-input:focus{border-color:rgba(127,227,255,.5)}
+.comment-item{padding:12px 14px;border-radius:10px;background:rgba(127,227,255,.04);border:1px solid rgba(127,227,255,.1)}
+body.light .blog-snippet,body.light .comment-item p{color:#4a5468}
+body.light .comment-item{background:rgba(10,20,40,.04);border-color:rgba(10,20,40,.1)}
+body.light .comment-input{background:rgba(255,255,255,.6);color:#0b0e16;border-color:rgba(10,20,40,.15)}
+@media(max-width:640px){.blog-card{aspect-ratio:auto}}
 
 .about-layout{display:grid;grid-template-columns:0.7fr 1.3fr;gap:32px;align-items:start}
 .card{padding:28px}
