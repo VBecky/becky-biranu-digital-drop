@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import {
   fetchPublishedPosts,
   fetchProjects,
@@ -479,18 +480,62 @@ function stripHtml(html: string) {
   return html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 }
 
+function getClientId(): string {
+  if (typeof window === "undefined") return "";
+  let id = localStorage.getItem("becky_client_id");
+  if (!id) {
+    id = (crypto.randomUUID?.() ?? Math.random().toString(36).slice(2) + Date.now().toString(36));
+    localStorage.setItem("becky_client_id", id);
+  }
+  return id;
+}
+
+type Comment = { id: string; post_id: string; author_name: string; content: string; created_at: string };
+
 function BlogSection() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [active, setActive] = useState<BlogPost | null>(null);
   const [popup, setPopup] = useState<string | null>(null);
+  const [likeCounts, setLikeCounts] = useState<Record<string, number>>({});
+  const [likedByMe, setLikedByMe] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
-    fetchPublishedPosts().then(setPosts);
+    fetchPublishedPosts().then(async (list) => {
+      setPosts(list);
+      if (list.length === 0) return;
+      const ids = list.map((p) => p.id);
+      const clientId = getClientId();
+      const { data: likes } = await supabase
+        .from("blog_likes" as any)
+        .select("post_id, client_id")
+        .in("post_id", ids);
+      const counts: Record<string, number> = {};
+      const mine: Record<string, boolean> = {};
+      (likes ?? []).forEach((l: any) => {
+        counts[l.post_id] = (counts[l.post_id] ?? 0) + 1;
+        if (l.client_id === clientId) mine[l.post_id] = true;
+      });
+      setLikeCounts(counts);
+      setLikedByMe(mine);
+    });
   }, []);
 
   const openPost = (p: BlogPost) => {
     setActive(p);
     if (p.popup && p.popup.trim()) setPopup(p.popup);
+  };
+
+  const toggleLike = async (postId: string, e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    if (likedByMe[postId]) return;
+    const clientId = getClientId();
+    setLikedByMe((m) => ({ ...m, [postId]: true }));
+    setLikeCounts((c) => ({ ...c, [postId]: (c[postId] ?? 0) + 1 }));
+    const { error } = await supabase.from("blog_likes" as any).insert({ post_id: postId, client_id: clientId });
+    if (error && !String(error.message).includes("duplicate")) {
+      setLikedByMe((m) => ({ ...m, [postId]: false }));
+      setLikeCounts((c) => ({ ...c, [postId]: Math.max(0, (c[postId] ?? 1) - 1) }));
+    }
   };
 
   return (
@@ -510,27 +555,38 @@ function BlogSection() {
           <div className="projects-grid">
             {posts.map((post, i) => {
               const snippet = post.excerpt?.trim() || stripHtml(post.content);
+              const liked = !!likedByMe[post.id];
+              const count = likeCounts[post.id] ?? 0;
               return (
                 <article
                   key={post.id}
-                  className="glass project-card tilt blog-card-text"
+                  className="glass project-card tilt blog-card"
                   onClick={() => openPost(post)}
                   style={{ animationDelay: `${i * 90}ms`, cursor: "pointer" }}
                 >
-                  {post.image_url ? (
-                    <div className="project-thumb">
+                  <div className="blog-thumb">
+                    {post.image_url ? (
                       <img src={post.image_url} alt={post.title} loading="lazy" className="thumb-img" />
-                    </div>
-                  ) : null}
-                  <div className="project-meta">
-                    <p className="tech" style={{ fontSize: 12, letterSpacing: ".2em", textTransform: "uppercase", color: "#7fe3ff", marginBottom: 10 }}>
-                      {formatDate(post.created_at)}
-                    </p>
-                    <h3>{post.title}</h3>
+                    ) : (
+                      <div className="blog-thumb-placeholder">📝</div>
+                    )}
+                  </div>
+                  <div className="blog-body">
+                    <p className="blog-date">{formatDate(post.created_at)}</p>
+                    <h3 className="blog-title">{post.title}</h3>
                     <p className="blog-snippet">{snippet}</p>
-                    <span className="blog-link">
-                      Read full article <span className="arrow">→</span>
-                    </span>
+                    <div className="blog-footer">
+                      <span className="blog-link">Read full <span className="arrow">→</span></span>
+                      <button
+                        className={`like-btn${liked ? " liked" : ""}`}
+                        onClick={(e) => toggleLike(post.id, e)}
+                        aria-label="Like"
+                        disabled={liked}
+                      >
+                        <span className="heart">{liked ? "♥" : "♡"}</span>
+                        <span className="count">{count}</span>
+                      </button>
+                    </div>
                   </div>
                 </article>
               );
@@ -540,19 +596,13 @@ function BlogSection() {
       </section>
 
       {active && (
-        <div className="modal open" onClick={(e) => { if (e.target === e.currentTarget) setActive(null); }}>
-          <div className="modal-inner glass" style={{ maxWidth: 720 }}>
-            <button className="modal-close" onClick={() => setActive(null)}>×</button>
-            {active.image_url && (
-              <img src={active.image_url} alt={active.title} style={{ width: "100%", borderRadius: 14, marginBottom: 18, maxHeight: 360, objectFit: "cover" }} />
-            )}
-            <h3 style={{ fontSize: 28, marginBottom: 8 }}>{active.title}</h3>
-            <p style={{ fontSize: 12, letterSpacing: ".2em", textTransform: "uppercase", color: "#7fe3ff", marginBottom: 18 }}>
-              {formatDate(active.created_at)}
-            </p>
-            <div style={{ color: "#b9c2d4", lineHeight: 1.7 }} dangerouslySetInnerHTML={{ __html: active.content }} />
-          </div>
-        </div>
+        <BlogModal
+          post={active}
+          onClose={() => setActive(null)}
+          liked={!!likedByMe[active.id]}
+          likeCount={likeCounts[active.id] ?? 0}
+          onLike={() => toggleLike(active.id)}
+        />
       )}
 
       {popup && (
@@ -566,6 +616,100 @@ function BlogSection() {
         </div>
       )}
     </>
+  );
+}
+
+function BlogModal({ post, onClose, liked, likeCount, onLike }: {
+  post: BlogPost; onClose: () => void; liked: boolean; likeCount: number; onLike: () => void;
+}) {
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [name, setName] = useState("");
+  const [text, setText] = useState("");
+  const [posting, setPosting] = useState(false);
+
+  const reload = async () => {
+    const { data } = await supabase
+      .from("blog_comments" as any)
+      .select("*")
+      .eq("post_id", post.id)
+      .order("created_at", { ascending: false });
+    setComments((data ?? []) as any);
+  };
+
+  useEffect(() => { reload(); }, [post.id]);
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!text.trim()) return;
+    setPosting(true);
+    const { error } = await supabase.from("blog_comments" as any).insert({
+      post_id: post.id,
+      author_name: name.trim() || "Anonymous",
+      content: text.trim(),
+    });
+    setPosting(false);
+    if (!error) { setText(""); reload(); }
+  };
+
+  return (
+    <div className="modal open" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className="modal-inner glass" style={{ maxWidth: 720 }}>
+        <button className="modal-close" onClick={onClose}>×</button>
+        {post.image_url && (
+          <img src={post.image_url} alt={post.title} style={{ width: "100%", borderRadius: 14, marginBottom: 18, maxHeight: 360, objectFit: "cover" }} />
+        )}
+        <h3 style={{ fontSize: 28, marginBottom: 8 }}>{post.title}</h3>
+        <p style={{ fontSize: 12, letterSpacing: ".2em", textTransform: "uppercase", color: "#7fe3ff", marginBottom: 18 }}>
+          {formatDate(post.created_at)}
+        </p>
+        <div style={{ color: "#b9c2d4", lineHeight: 1.7 }} dangerouslySetInnerHTML={{ __html: post.content }} />
+
+        <div style={{ display: "flex", alignItems: "center", gap: 14, marginTop: 26, paddingTop: 18, borderTop: "1px solid rgba(127,227,255,.15)" }}>
+          <button className={`like-btn${liked ? " liked" : ""}`} onClick={onLike} disabled={liked} aria-label="Like article">
+            <span className="heart">{liked ? "♥" : "♡"}</span>
+            <span className="count">{likeCount} {likeCount === 1 ? "like" : "likes"}</span>
+          </button>
+          <span style={{ color: "#7a8499", fontSize: 13 }}>{comments.length} {comments.length === 1 ? "comment" : "comments"}</span>
+        </div>
+
+        <form onSubmit={submit} style={{ marginTop: 20, display: "flex", flexDirection: "column", gap: 10 }}>
+          <input
+            className="comment-input"
+            placeholder="Your name (optional)"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            maxLength={80}
+          />
+          <textarea
+            className="comment-input"
+            placeholder="Share your thoughts…"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            rows={3}
+            maxLength={2000}
+            required
+          />
+          <button className="drop-btn primary" type="submit" disabled={posting || !text.trim()} style={{ alignSelf: "flex-start" }}>
+            {posting ? "Posting…" : "Post comment"}
+          </button>
+        </form>
+
+        <div style={{ marginTop: 22, display: "flex", flexDirection: "column", gap: 12 }}>
+          {comments.map((c) => (
+            <div key={c.id} className="comment-item">
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                <strong style={{ color: "#e6ecf8", fontSize: 14 }}>{c.author_name}</strong>
+                <span style={{ color: "#7a8499", fontSize: 12 }}>{formatDate(c.created_at)}</span>
+              </div>
+              <p style={{ color: "#b9c2d4", fontSize: 14, lineHeight: 1.6, whiteSpace: "pre-wrap" }}>{c.content}</p>
+            </div>
+          ))}
+          {comments.length === 0 && (
+            <p style={{ color: "#7a8499", fontSize: 13, textAlign: "center", padding: "12px 0" }}>Be the first to comment.</p>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -635,13 +779,34 @@ body.light #bg-canvas{opacity:.35}
 .section-head h2{font-size:clamp(32px,5vw,56px);font-weight:600;letter-spacing:-.02em;line-height:1.05}
 .section-sub{margin-top:18px;color:#8a93a8;font-size:15px;line-height:1.7;max-width:560px}
 
-.blog-link{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:#7fe3ff;letter-spacing:.08em;margin-top:6px;transition:gap .3s}
+.blog-link{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#7fe3ff;letter-spacing:.06em;transition:gap .3s}
 .blog-link .arrow{transition:transform .3s}
-.project-card:hover .blog-link{gap:14px}
+.project-card:hover .blog-link{gap:12px}
 .project-card:hover .blog-link .arrow{transform:translateX(4px)}
-.blog-card-text .project-meta{padding:22px 14px 16px;display:flex;flex-direction:column;gap:10px}
-.blog-snippet{display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;color:#8a93a8;font-size:14px;line-height:1.6}
 .blog-empty{max-width:520px;margin:0 auto;padding:40px;text-align:center;color:#8a93a8;font-size:15px}
+
+.blog-card{padding:0;overflow:hidden;display:flex;flex-direction:column;aspect-ratio:1/1.15}
+.blog-thumb{position:relative;width:100%;aspect-ratio:1/1;overflow:hidden;background:linear-gradient(135deg,#0ea5e9,#6366f1,#a855f7);flex-shrink:0}
+.blog-thumb .thumb-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .8s cubic-bezier(.2,.8,.2,1)}
+.blog-card:hover .thumb-img{transform:scale(1.06)}
+.blog-thumb-placeholder{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:48px;opacity:.6}
+.blog-body{padding:14px 16px 14px;display:flex;flex-direction:column;gap:6px;flex:1;min-height:0}
+.blog-date{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#7fe3ff;margin:0}
+.blog-title{font-size:16px;font-weight:600;line-height:1.25;margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.blog-snippet{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:#8a93a8;font-size:12.5px;line-height:1.5;margin:0}
+.blog-footer{margin-top:auto;padding-top:8px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.like-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;border:1px solid rgba(255,120,180,.3);background:rgba(255,120,180,.08);color:#ffb3d1;font-size:12px;cursor:pointer;transition:all .25s;font-family:inherit}
+.like-btn:hover:not(:disabled){background:rgba(255,120,180,.18);transform:translateY(-1px)}
+.like-btn.liked{background:rgba(255,80,140,.22);border-color:rgba(255,80,140,.55);color:#ff7fb0}
+.like-btn .heart{font-size:14px;line-height:1}
+.like-btn:disabled{cursor:default}
+.comment-input{width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(127,227,255,.18);background:rgba(8,12,22,.5);color:#e6ecf8;font-family:inherit;font-size:14px;resize:vertical;outline:none;transition:border-color .2s}
+.comment-input:focus{border-color:rgba(127,227,255,.5)}
+.comment-item{padding:12px 14px;border-radius:10px;background:rgba(127,227,255,.04);border:1px solid rgba(127,227,255,.1)}
+body.light .blog-snippet,body.light .comment-item p{color:#4a5468}
+body.light .comment-item{background:rgba(10,20,40,.04);border-color:rgba(10,20,40,.1)}
+body.light .comment-input{background:rgba(255,255,255,.6);color:#0b0e16;border-color:rgba(10,20,40,.15)}
+@media(max-width:640px){.blog-card{aspect-ratio:auto}}
 
 .about-layout{display:grid;grid-template-columns:0.7fr 1.3fr;gap:32px;align-items:start}
 .card{padding:28px}
