@@ -179,7 +179,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      unlike_post: {
+        Args: { _client_id: string; _post_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
