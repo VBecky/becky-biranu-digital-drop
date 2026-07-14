@@ -787,7 +787,7 @@ body.light #bg-canvas{opacity:.35}
 
 .blog-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px;max-width:1000px;margin:0 auto}
 .blog-card{padding:0;overflow:hidden;display:flex;flex-direction:column;aspect-ratio:1/1}
-.blog-thumb{position:relative;width:100%;aspect-ratio:16/10;overflow:hidden;background:linear-gradient(135deg,#0ea5e9,#6366f1,#a855f7);flex-shrink:0}
+.blog-thumb{position:relative;width:100%;aspect-ratio:16/7;max-height:110px;overflow:hidden;background:linear-gradient(135deg,#0ea5e9,#6366f1,#a855f7);flex-shrink:0}
 .blog-thumb .thumb-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .8s cubic-bezier(.2,.8,.2,1)}
 .blog-card:hover .thumb-img{transform:scale(1.06)}
 .blog-thumb-placeholder{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:32px;opacity:.6}
