@@ -479,18 +479,62 @@ function stripHtml(html: string) {
   return html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 }
 
+function getClientId(): string {
+  if (typeof window === "undefined") return "";
+  let id = localStorage.getItem("becky_client_id");
+  if (!id) {
+    id = (crypto.randomUUID?.() ?? Math.random().toString(36).slice(2) + Date.now().toString(36));
+    localStorage.setItem("becky_client_id", id);
+  }
+  return id;
+}
+
+type Comment = { id: string; post_id: string; author_name: string; content: string; created_at: string };
+
 function BlogSection() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [active, setActive] = useState<BlogPost | null>(null);
   const [popup, setPopup] = useState<string | null>(null);
+  const [likeCounts, setLikeCounts] = useState<Record<string, number>>({});
+  const [likedByMe, setLikedByMe] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
-    fetchPublishedPosts().then(setPosts);
+    fetchPublishedPosts().then(async (list) => {
+      setPosts(list);
+      if (list.length === 0) return;
+      const ids = list.map((p) => p.id);
+      const clientId = getClientId();
+      const { data: likes } = await supabase
+        .from("blog_likes" as any)
+        .select("post_id, client_id")
+        .in("post_id", ids);
+      const counts: Record<string, number> = {};
+      const mine: Record<string, boolean> = {};
+      (likes ?? []).forEach((l: any) => {
+        counts[l.post_id] = (counts[l.post_id] ?? 0) + 1;
+        if (l.client_id === clientId) mine[l.post_id] = true;
+      });
+      setLikeCounts(counts);
+      setLikedByMe(mine);
+    });
   }, []);
 
   const openPost = (p: BlogPost) => {
     setActive(p);
     if (p.popup && p.popup.trim()) setPopup(p.popup);
+  };
+
+  const toggleLike = async (postId: string, e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    if (likedByMe[postId]) return;
+    const clientId = getClientId();
+    setLikedByMe((m) => ({ ...m, [postId]: true }));
+    setLikeCounts((c) => ({ ...c, [postId]: (c[postId] ?? 0) + 1 }));
+    const { error } = await supabase.from("blog_likes" as any).insert({ post_id: postId, client_id: clientId });
+    if (error && !String(error.message).includes("duplicate")) {
+      setLikedByMe((m) => ({ ...m, [postId]: false }));
+      setLikeCounts((c) => ({ ...c, [postId]: Math.max(0, (c[postId] ?? 1) - 1) }));
+    }
   };
 
   return (
@@ -510,27 +554,38 @@ function BlogSection() {
           <div className="projects-grid">
             {posts.map((post, i) => {
               const snippet = post.excerpt?.trim() || stripHtml(post.content);
+              const liked = !!likedByMe[post.id];
+              const count = likeCounts[post.id] ?? 0;
               return (
                 <article
                   key={post.id}
-                  className="glass project-card tilt blog-card-text"
+                  className="glass project-card tilt blog-card"
                   onClick={() => openPost(post)}
                   style={{ animationDelay: `${i * 90}ms`, cursor: "pointer" }}
                 >
-                  {post.image_url ? (
-                    <div className="project-thumb">
+                  <div className="blog-thumb">
+                    {post.image_url ? (
                       <img src={post.image_url} alt={post.title} loading="lazy" className="thumb-img" />
-                    </div>
-                  ) : null}
-                  <div className="project-meta">
-                    <p className="tech" style={{ fontSize: 12, letterSpacing: ".2em", textTransform: "uppercase", color: "#7fe3ff", marginBottom: 10 }}>
-                      {formatDate(post.created_at)}
-                    </p>
-                    <h3>{post.title}</h3>
+                    ) : (
+                      <div className="blog-thumb-placeholder">📝</div>
+                    )}
+                  </div>
+                  <div className="blog-body">
+                    <p className="blog-date">{formatDate(post.created_at)}</p>
+                    <h3 className="blog-title">{post.title}</h3>
                     <p className="blog-snippet">{snippet}</p>
-                    <span className="blog-link">
-                      Read full article <span className="arrow">→</span>
-                    </span>
+                    <div className="blog-footer">
+                      <span className="blog-link">Read full <span className="arrow">→</span></span>
+                      <button
+                        className={`like-btn${liked ? " liked" : ""}`}
+                        onClick={(e) => toggleLike(post.id, e)}
+                        aria-label="Like"
+                        disabled={liked}
+                      >
+                        <span className="heart">{liked ? "♥" : "♡"}</span>
+                        <span className="count">{count}</span>
+                      </button>
+                    </div>
                   </div>
                 </article>
               );
@@ -540,19 +595,13 @@ function BlogSection() {
       </section>
 
       {active && (
-        <div className="modal open" onClick={(e) => { if (e.target === e.currentTarget) setActive(null); }}>
-          <div className="modal-inner glass" style={{ maxWidth: 720 }}>
-            <button className="modal-close" onClick={() => setActive(null)}>×</button>
-            {active.image_url && (
-              <img src={active.image_url} alt={active.title} style={{ width: "100%", borderRadius: 14, marginBottom: 18, maxHeight: 360, objectFit: "cover" }} />
-            )}
-            <h3 style={{ fontSize: 28, marginBottom: 8 }}>{active.title}</h3>
-            <p style={{ fontSize: 12, letterSpacing: ".2em", textTransform: "uppercase", color: "#7fe3ff", marginBottom: 18 }}>
-              {formatDate(active.created_at)}
-            </p>
-            <div style={{ color: "#b9c2d4", lineHeight: 1.7 }} dangerouslySetInnerHTML={{ __html: active.content }} />
-          </div>
-        </div>
+        <BlogModal
+          post={active}
+          onClose={() => setActive(null)}
+          liked={!!likedByMe[active.id]}
+          likeCount={likeCounts[active.id] ?? 0}
+          onLike={() => toggleLike(active.id)}
+        />
       )}
 
       {popup && (
@@ -566,6 +615,100 @@ function BlogSection() {
         </div>
       )}
     </>
+  );
+}
+
+function BlogModal({ post, onClose, liked, likeCount, onLike }: {
+  post: BlogPost; onClose: () => void; liked: boolean; likeCount: number; onLike: () => void;
+}) {
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [name, setName] = useState("");
+  const [text, setText] = useState("");
+  const [posting, setPosting] = useState(false);
+
+  const reload = async () => {
+    const { data } = await supabase
+      .from("blog_comments" as any)
+      .select("*")
+      .eq("post_id", post.id)
+      .order("created_at", { ascending: false });
+    setComments((data ?? []) as any);
+  };
+
+  useEffect(() => { reload(); }, [post.id]);
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!text.trim()) return;
+    setPosting(true);
+    const { error } = await supabase.from("blog_comments" as any).insert({
+      post_id: post.id,
+      author_name: name.trim() || "Anonymous",
+      content: text.trim(),
+    });
+    setPosting(false);
+    if (!error) { setText(""); reload(); }
+  };
+
+  return (
+    <div className="modal open" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className="modal-inner glass" style={{ maxWidth: 720 }}>
+        <button className="modal-close" onClick={onClose}>×</button>
+        {post.image_url && (
+          <img src={post.image_url} alt={post.title} style={{ width: "100%", borderRadius: 14, marginBottom: 18, maxHeight: 360, objectFit: "cover" }} />
+        )}
+        <h3 style={{ fontSize: 28, marginBottom: 8 }}>{post.title}</h3>
+        <p style={{ fontSize: 12, letterSpacing: ".2em", textTransform: "uppercase", color: "#7fe3ff", marginBottom: 18 }}>
+          {formatDate(post.created_at)}
+        </p>
+        <div style={{ color: "#b9c2d4", lineHeight: 1.7 }} dangerouslySetInnerHTML={{ __html: post.content }} />
+
+        <div style={{ display: "flex", alignItems: "center", gap: 14, marginTop: 26, paddingTop: 18, borderTop: "1px solid rgba(127,227,255,.15)" }}>
+          <button className={`like-btn${liked ? " liked" : ""}`} onClick={onLike} disabled={liked} aria-label="Like article">
+            <span className="heart">{liked ? "♥" : "♡"}</span>
+            <span className="count">{likeCount} {likeCount === 1 ? "like" : "likes"}</span>
+          </button>
+          <span style={{ color: "#7a8499", fontSize: 13 }}>{comments.length} {comments.length === 1 ? "comment" : "comments"}</span>
+        </div>
+
+        <form onSubmit={submit} style={{ marginTop: 20, display: "flex", flexDirection: "column", gap: 10 }}>
+          <input
+            className="comment-input"
+            placeholder="Your name (optional)"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            maxLength={80}
+          />
+          <textarea
+            className="comment-input"
+            placeholder="Share your thoughts…"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            rows={3}
+            maxLength={2000}
+            required
+          />
+          <button className="drop-btn primary" type="submit" disabled={posting || !text.trim()} style={{ alignSelf: "flex-start" }}>
+            {posting ? "Posting…" : "Post comment"}
+          </button>
+        </form>
+
+        <div style={{ marginTop: 22, display: "flex", flexDirection: "column", gap: 12 }}>
+          {comments.map((c) => (
+            <div key={c.id} className="comment-item">
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+                <strong style={{ color: "#e6ecf8", fontSize: 14 }}>{c.author_name}</strong>
+                <span style={{ color: "#7a8499", fontSize: 12 }}>{formatDate(c.created_at)}</span>
+              </div>
+              <p style={{ color: "#b9c2d4", fontSize: 14, lineHeight: 1.6, whiteSpace: "pre-wrap" }}>{c.content}</p>
+            </div>
+          ))}
+          {comments.length === 0 && (
+            <p style={{ color: "#7a8499", fontSize: 13, textAlign: "center", padding: "12px 0" }}>Be the first to comment.</p>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
 
