@@ -873,9 +873,17 @@ body.light .comment-input{background:rgba(255,255,255,.6);color:#0b0e16;border-c
 
 .footer{position:relative;z-index:1;display:flex;justify-content:space-between;padding:40px 32px;font-size:12px;color:#5a6480;border-top:1px solid rgba(255,255,255,.05);flex-wrap:wrap;gap:10px}
 
-.modal{position:fixed;inset:0;z-index:200;background:rgba(2,4,10,.7);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .35s}
+.modal{position:fixed;inset:0;z-index:200;background:rgba(2,4,10,.7);backdrop-filter:blur(8px);display:flex;align-items:flex-start;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .35s;overflow-y:auto}
 .modal.open{opacity:1;pointer-events:auto}
-.modal-inner{max-width:560px;width:100%;padding:40px;position:relative;transform:scale(.96);transition:transform .4s cubic-bezier(.2,.8,.2,1)}
+.modal-inner{max-width:560px;width:100%;padding:40px;position:relative;transform:scale(.96);transition:transform .4s cubic-bezier(.2,.8,.2,1);max-height:calc(100vh - 48px);overflow-y:auto;margin:auto}
 .modal.open .modal-inner{transform:scale(1)}
-.modal-close{position:absolute;top:14px;right:18px;background:transparent;border:none;color:inherit;font-size:28px;cursor:none;line-height:1}
+.modal-close{position:absolute;top:14px;right:18px;background:transparent;border:none;color:inherit;font-size:28px;cursor:none;line-height:1;z-index:2}
+.blog-article-body{color:#b9c2d4;line-height:1.75;word-wrap:break-word;overflow-wrap:break-word}
+.blog-article-body img,.blog-article-body video{max-width:100%;height:auto;border-radius:10px;margin:12px 0}
+.blog-article-body p{margin:0 0 12px}
+.blog-article-body h1,.blog-article-body h2,.blog-article-body h3{margin:18px 0 10px;color:#e7ecf3}
+.blog-article-body a{color:#7fe3ff;text-decoration:underline}
+body.light .blog-article-body{color:#2a3145}
+body.light .blog-article-body h1,body.light .blog-article-body h2,body.light .blog-article-body h3{color:#0b0e16}
+@media (max-width:640px){.modal{padding:12px}.modal-inner{padding:22px;max-height:calc(100vh - 24px)}.modal-inner h3{font-size:22px !important}}
 `;
