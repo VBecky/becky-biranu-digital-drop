@@ -662,7 +662,7 @@ function BlogModal({ post, onClose, liked, likeCount, onLike }: {
         <p style={{ fontSize: 12, letterSpacing: ".2em", textTransform: "uppercase", color: "#7fe3ff", marginBottom: 18 }}>
           {formatDate(post.created_at)}
         </p>
-        <div style={{ color: "#b9c2d4", lineHeight: 1.7 }} dangerouslySetInnerHTML={{ __html: post.content }} />
+        <div className="blog-article-body" dangerouslySetInnerHTML={{ __html: post.content }} />
 
         <div style={{ display: "flex", alignItems: "center", gap: 14, marginTop: 26, paddingTop: 18, borderTop: "1px solid rgba(127,227,255,.15)" }}>
           <button className={`like-btn${liked ? " liked" : ""}`} onClick={onLike} disabled={liked} aria-label="Like article">
